@@ -4,7 +4,7 @@
 
 前往 [官方網站](https://endeavouros.com/#Download) 選擇鏡像並歸檔
 
-使用 *Etcher* 燒錄映像檔至USB Disk
+使用 [Etcher](https://etcher.balena.io/) 燒錄映像檔至USB Disk
 
 ## 2. 變更UEFI BIOS設定並載入ISO
 
@@ -14,7 +14,7 @@
 
 按下`F7`進入進階選單，檢查「安全性」欄，關閉「安全啓動」或將類型變更爲`Other OS`或`Microsoft & 3rd Party`。
 
-套用變更並重設電源，於啓動選單中選擇 `UEFI: <Your Device Name>` 以載入 `Systemd-boot` 載入程式，選擇載入專有驅動程式（*NVIDIA* Cards），進入Live ISO環境。
+套用變更並重設電源，於啓動選單中選擇 `UEFI: <Your Device Name>` 以載入 `systemd-boot` 載入程式，選擇載入專有驅動程式（NVIDIA Cards），進入Live ISO環境。
 
 ## 3. 配置網路界面卡並選擇鏡像
 
@@ -33,9 +33,9 @@
 
 ## 4. 使用安裝程式安裝作業系統
 
-- 於*Welcome*程式中選取*Start the Installer*，選取*Online*，進入安裝程式。
+- 於*eos-welcome*程式中選取*Start the Installer*，選取*Online*，進入安裝程式。
 - 根據自身情況選擇語言、時區、鍵盤格式。
-- 桌面環境建議選擇*KDE Plasma*或*GNOME*
+- 桌面環境建議選擇*KDE Plasma*或*GNOME* （此處以*Plasma*爲例）
 - 預先安裝的程式包套用預設即可，或加入*Printing Support*
 - 載入程式建議使用`grub`，否則無法啓動至btrfs快照
 - 磁碟分割可以參考附錄表
@@ -46,6 +46,8 @@
 
 ### 校準硬體時間
 
+此處使得Linux使用Windows時間寫入標準
+
 ```sh
 sudo timedatectl set-local-rtc 1 -–adjust-system-clock
 ```
@@ -53,7 +55,7 @@ sudo timedatectl set-local-rtc 1 -–adjust-system-clock
 ### 安裝必備程式包（透過`pacman`），執行：
 
 ```sh
-sudo pacman -S plasma-wayland-session fcitx5 fcitx5-qt fcitx5-gtk fcitx5-chinese-addons kcm-fcitx5 fcitx5-material-color grub-btrfs inotify-tools htop nvtop
+sudo pacman -S plasma-wayland-session fcitx5 fcitx5-qt fcitx5-gtk fcitx5-chinese-addons kcm-fcitx5 fcitx5-material-color grub-btrfs inotify-tools htop nvtop yay
 ```
 
 ### 配置btrfs文件系統快照備份（使用*Timeshift*）
@@ -90,15 +92,15 @@ yay -S timeshift timeshift-autosnap
   sudo grub-mkconfig -o /boot/grub/grub.cfg
   ```
 
-  >注意：由於Arch Linux滾動更新的特性，Linux内核通常是緊隨Linus Torvalds的更新步調，而更新内核后會出現grub啓動選單沒有Endeavour OS Snapshots的選項，此時再次執行上述套用設定的命令即可。
+  >注意：由於Arch Linux滾動更新的特性，Linux内核通常是緊隨Linus Torvalds的更新步調，而更新内核后會出現`grub`啓動選單沒有`Endeavour OS Snapshots`的選項，此時再次執行上述套用設定的命令即可。
 
 #### 配置*Timeshift*
 
-執行`Timeshift`，快照類型選取*BTRFS*，位置套用預設即可，自動建立快照可以勾選*Daily*和*Boot*，`/home`已是另一個分割，因此無需添加`@home`子卷。
+執行`Timeshift`，快照類型選取*BTRFS*，位置套用預設即可，自動建立快照可以勾選*Daily*和*Boot*，例子中`/home`已是另一個分割區，因此無需涵蓋`@home`子卷。
 
 #### 使用*Timeshift*定時快照
 
-*Timeshift*定時快照依賴於`cronie.service`，而這并非是預設啓用的。
+*Timeshift*定時快照依賴於`cron`，而這并非是預設啓用的。
 
 執行
 ```sh
@@ -114,7 +116,7 @@ sudo systemctl enable cronie --now
 sudo systemctl status grub-btrfsd
 ```
 
-檢查輸出日志，若有`Grub menu recreated`即配置成功，下次重新開機即可於grub選單中選擇`btrfs`唯讀快照啓動。
+檢查輸出日志，若有`Grub menu recreated`即配置成功，下次重新開機即可於`grub`選單中選擇`Endeavour OS Snapshots`啓動到唯讀快照。
 
 ### 重新開機並配置fcitx5
 
