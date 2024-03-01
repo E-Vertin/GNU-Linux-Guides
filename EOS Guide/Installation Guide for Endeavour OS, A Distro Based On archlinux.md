@@ -64,7 +64,7 @@ sudo nano /etc/pacman.conf
 ```
 以使用`nano`編輯`pacman`的配置檔案
 
-按下Control和End將光標移至檔案末尾，添加
+按下`Control`和`End`將光標移至檔案末尾，添加
 ```sh
 [archlinuxcn]
 Server = https://repo.archlinuxcn.org/$arch
