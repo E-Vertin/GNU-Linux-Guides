@@ -52,6 +52,38 @@
 sudo timedatectl set-local-rtc 1 -–adjust-system-clock
 ```
 
+### 加入archlinuxcn倉庫
+
+**“archlinuxcn倉庫是由Arch Linux中文社區管理的第三者倉庫，其提供了許多額外的程式包，也包含了許多程式的git版本及其變種。一部分來源於AUR，但也有許多與AUR的不同。”**
+
+由於archlinuxcn倉庫並不在`pacman`所認可的範圍内，我們需要手動添加archlinuxcn倉庫及其位址。
+
+執行
+```sh
+sudo nano /etc/pacman.conf
+```
+以使用`nano`編輯`pacman`的配置檔案
+
+按下Control和End將光標移至檔案末尾，添加
+```sh
+[archlinuxcn]
+Server = https://repo.archlinuxcn.org/$arch
+```
+
+隨即執行
+```sh
+sudo pacman -S archlinuxcn-keyring
+```
+以加入archlinuxcn倉庫的PGP密鑰
+
+再執行
+```sh
+sudo pacman -Syy
+```
+以强制重新整理本機數據庫
+
+（可選）安裝`archlinuxcn-mirrorlist-git`以獲得一份archlinuxcn鏡像列表，以便于`/etc/pacman.conf`中直接引入
+
 ### 安裝必備程式包（透過`pacman`），執行：
 
 ```sh
