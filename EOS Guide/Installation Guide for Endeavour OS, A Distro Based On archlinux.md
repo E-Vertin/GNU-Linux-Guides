@@ -70,17 +70,17 @@ sudo nano /etc/pacman.conf
 Server = https://repo.archlinuxcn.org/$arch
 ```
 
+執行
+```sh
+sudo pacman-key --lsign-key "farseerfc@archlinux.org"
+```
+以在本機添加對farseerfc的密鑰的信任
+
 隨即執行
 ```sh
-sudo pacman -S archlinuxcn-keyring
+sudo pacman -Sy archlinuxcn-keyring
 ```
 以加入archlinuxcn倉庫的PGP密鑰
-
-再執行
-```sh
-sudo pacman -Syy
-```
-以强制重新整理本機數據庫
 
 （可選）安裝`archlinuxcn-mirrorlist-git`以獲得一份archlinuxcn鏡像列表，以便于`/etc/pacman.conf`中直接引入
 
