@@ -87,7 +87,7 @@ sudo pacman -Sy archlinuxcn-keyring
 ### 安裝必備程式包（透過`pacman`），執行：
 
 ```sh
-sudo pacman -S plasma-wayland-session fcitx5 fcitx5-qt fcitx5-gtk fcitx5-chinese-addons kcm-fcitx5 fcitx5-material-color grub-btrfs inotify-tools htop nvtop yay
+sudo pacman -S plasma-wayland-session fcitx5 fcitx5-qt fcitx5-gtk fcitx5-chinese-addons kcm-fcitx5 fcitx5-material-color grub-btrfs inotify-tools htop nvtop
 ```
 
 ### 配置btrfs文件系統快照備份（使用*Timeshift*）
