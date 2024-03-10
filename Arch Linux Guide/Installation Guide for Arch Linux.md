@@ -1,12 +1,12 @@
-# Installation Guide for Arch Linux, A Meta Linux Distro
+# Installation Guide for Arch Linux, An Arch Linux for EVERYONE!
 
 # TO BE ACCOMPLISHED
 
 ## 1. 歸檔並燒錄映像檔
 
-前往 [官方網站](https://archlinux.org/download/) 進行歸檔或選擇鏡像
+前往 [官方網站](https://endeavouros.com/#Download) 選擇鏡像並歸檔
 
-使用 *Etcher* 燒錄映像檔至USB Disk
+使用 [Etcher](https://etcher.balena.io/) 燒錄映像檔至USB Disk
 
 ## 2. 變更UEFI BIOS設定並載入ISO
 
@@ -157,7 +157,7 @@ timedatectl set-timezone Asia/Chongqing
 
 ## 於Live ISO環境執行作業系統的安裝
 
-### 使用Arch Linux Live ISO中的`archinstall`脚本執行安裝
+### 使用Arch Linux的`archinstall`脚本執行安裝
 
 `archinstall`是一個全自動的Arch Linux安裝脚本，提供了使用者以填寫問卷的形式執行安裝作業。
 
