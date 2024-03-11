@@ -24,8 +24,9 @@
     ```sh
     sudo reflector --sort rate --threads 100 -c China --save /etc/pacman.d/mirrorlist
     ```
-- 手動添加鏡像，可編輯`/etc/pacman.d/mirrorlist`\
-（例子）於頂端添加該行：
+- 手動添加鏡像，可編輯`/etc/pacman.d/mirrorlist`
+  
+- （例子）於頂端添加該行：
     ```
     Server = http://mirrors.aliyun.com/archlinux/$repo/os/$arch
     ```
@@ -87,33 +88,24 @@ sudo pacman -Sy archlinuxcn-keyring
 ### 安裝必備程式包（透過`pacman`），執行：
 
 ```sh
-sudo pacman -S plasma-wayland-session fcitx5 fcitx5-qt fcitx5-gtk fcitx5-chinese-addons kcm-fcitx5 fcitx5-material-color grub-btrfs inotify-tools htop nvtop
+sudo pacman -S fcitx5 fcitx5-qt fcitx5-gtk fcitx5-chinese-addons kcm-fcitx5 grub-btrfs inotify-tools htop nvtop
 ```
+>注意：Plasma 6桌面環境更新后，`plasma-wayland-session`已不存在於Arch Linux倉庫
 
-### 配置btrfs文件系統快照備份（使用*Timeshift*）
+### 配置btrfs文件系統快照備份（使用*Snapper*）
 
 `yay`可以存取*Arch User Repositories*，提供了更多的軟體
 
-#### 安裝*Timeshift*
+#### 安裝*Snapper*
 
 ```sh
-yay -S timeshift timeshift-autosnap
+yay -S snapper snap-pac btrfs-assistant
 ```
 
 #### 配置`grub`啓動項目，可以使用`grub-btrfs`守護程式
 
-- 變更`grub-btrfsd`設定：
-  ```sh
-  sudo systemctl edit –-full grub-btrfsd
-  ```
-  找到
-  ```sh
-  ExecStart = /usr/bin/grub-btrfsd –-syslog /.snapshots
-  ```
-  改爲
-  ```sh
-  ExecStart = /usr/bin/grub-btrfsd –-syslog -t
-  ```
+  >注意：使用*Snapper*不需要變更`grub-btrfs`設定，因爲其快照會儲存于/.snapshots中
+
 - 套用變更后，啓用該服務並檢查狀況：
   ```sh
   sudo systemctl enable grub-btrfsd --now
@@ -126,22 +118,23 @@ yay -S timeshift timeshift-autosnap
 
   >注意：由於Arch Linux滾動更新的特性，Linux内核通常是緊隨Linus Torvalds的更新步調，而更新内核后會出現`grub`啓動選單沒有`Endeavour OS Snapshots`的選項，此時再次執行上述套用設定的命令即可。
 
-#### 配置*Timeshift*
+#### 配置*Snapper*
 
-執行`Timeshift`，快照類型選取*BTRFS*，位置套用預設即可，自動建立快照可以勾選*Daily*和*Boot*，例子中`/home`已是另一個分割區，因此無需涵蓋`@home`子卷。
+確保/.snapshots資料夾暫不存在且不挂載@.snapshots子卷，執行`btrfs-assistant`以進行配置。
 
-#### 使用*Timeshift*定時快照
+#### 使用*Snapper*定時快照
 
-*Timeshift*定時快照依賴於`cron`，而這并非是預設啓用的。
+*Snapper*定時快照亦可于`btrfs-assistant`中進行設定。
 
-執行
-```sh
-sudo systemctl enable cronie --now
-```
+#### 使用`snap-pac`的`pacman`挂鈎
+
+安裝該包且建立`snapper`的設定檔后，可於`/etc/snap-pac.ini`進行設定。
+
+>注意：請認真閲讀該檔案中的注釋！
 
 #### 嘗試建立一個快照並檢查`grub-btrfs` 守護進程的狀況
 
-於*Timeshift*中建立一個快照，注釋為`Setup`，退出*Timeshift*
+於*Snapper*中建立一個快照，注釋為`Setup`
 
 執行
 ```sh
