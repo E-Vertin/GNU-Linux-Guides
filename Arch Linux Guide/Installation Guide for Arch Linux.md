@@ -157,7 +157,144 @@ timedatectl set-timezone Asia/Chongqing
 
 ## 於Live ISO環境執行作業系統的安裝
 
+>此處要强調的是“Live ISO”環境，使用Arch Linux Live ISO并不是强制條件。因爲在Arch Linux Live ISO中有時候條件不充分，例如學生欲使用要求身份認證的校園網執行安裝作業，此時利用Endeavour OS的Live ISO或許更好。
+
 ### 使用Arch Linux的`archinstall`脚本執行安裝
+
+爲確保安裝作業順利進行，請使用最新版本的`archinstall`
+
+執行
+```sh
+pacman -Sy archinstall
+```
 
 `archinstall`是一個全自動的Arch Linux安裝脚本，提供了使用者以填寫問卷的形式執行安裝作業。
 
+>注意：鑒於`archinstall`提供的磁碟分割工具較難上手，此處先使用`cfdisk`編輯磁碟分割表，再進入`archinstall`程式執行安裝
+
+#### 準備磁碟
+
+**首先，我們需要檢查磁碟裝置**
+```sh
+lsblk
+```
+此處注意檢查整個磁碟的大小以區分
+
+若您使用的是相同大小的甚至是相同型號的磁碟
+請執行
+```sh
+fdisk -l
+```
+以仔細檢查
+
+**確定目標磁碟后，開始編輯磁碟分割表**
+
+與終端中執行
+```sh
+cfdisk <目標磁碟>
+```
+
+例如
+```sh
+cfdisk /dev/sda
+```
+即可進入`cfdisk`實用程式以編輯`/dev/sda`裝置的磁碟分割表
+
+`cfdisk`是`fdisk`的Terminal UI版本，這樣可以讓您清楚您在做什麽
+
+>注意：由於Arch Linux會把vmlinuz與ucode鏡像檔存放於`/boot`，建議該分割不小於500M，若要使用多個内核，請按需分配
+
+執行完分割表編輯后，以60G的磁碟爲例，所得結果可以是這樣的：
+| `/dev/sda` | Size | Type |
+|-|-|-|
+`/dev/sda1` | 500M | EFI System |
+`/dev/sda2` | 40G | Linux root (x86-64) |
+`/dev/sda3` | 19.5G | Linux home |
+
+**對磁碟分割執行初始化**
+
+請再次執行`lsblk`以作參照
+
+繼續先前例子，可以執行以下命令
+
+```sh
+mkfs.fat -F32 /dev/sda1 -n ARCH
+mkfs.btrfs /dev/sda2 -f
+mkfs.f2fs /dev/sda3 -f -l Home
+```
+
+**在使用`archinstall`執行安裝作業前，請檢查鏡像列表**
+
+執行
+```sh
+nano /etc/pacman.d/mirrorlist
+```
+
+加入欲使用的鏡像伺服器，按下`Control`和`O`寫入，按下`Enter`以使用原本的檔案名，再按下`Control`和`X`退出
+
+**開始安裝**
+
+>注意：於`archinstall`中，*Mirrors*欄目應選取您所在地區的鏡像伺服器
+
+*Disk configuration*中應選取*Manual Partitioning*，按下`Space`選取您先前編輯過磁碟分割表的硬碟，再按下`Enter`確認
+
+可以以此為例進行設定
+
+| Status | Device | Size | FS type | Mountpoint | Mount options | Flags | Btrfs vol |
+|-|-|-|-|-|-|-|-|
+| existing |`/dev/sda1` | 524 MB | fat32 | `/boot` | | Boot, ESP | |
+| modify | `/dev/sda2` | 42 GB | btrfs | | compress=zstd | | 2 subvolume |
+| existing | `/dev/sda3` | 20 GB | f2fs | `/home` | | | |
+
+對於btrfs子卷的設定，可以參考此表格
+
+| name | mountpoint | compress | nodatacow|
+|-|-|-|-|
+`@` | `/` | True | False |
+`@var` | `/var` | False | True |
+
+其他設定可以依照個人偏好設定
+| Options | Description |
+|-|-|
+| Mirrors | 自訂 |
+| Locales | 自訂 |
+| Disk configuration | Manual Partitioning |
+| Disk encryption | |
+| Bootloader | Grub |
+| Swap | False |
+| Hostname | 自訂 |
+| Root password | ****** |
+| User account | 1 User(s) |
+| Profile | Desktop |
+| Audio | Pipewire |
+| Kernels | linux |
+| Additional packages | 自訂 |
+| Network configuration | Use NetworkManager |
+| Timezone | 自訂 |
+| Automatic time sync (NTP) | True |
+| Optional repositories | multilib |
+
+對於*Additional packages*，可以加入：
+`firefox` `nano` `fish`
+
+選取*Install*以執行安裝
+
+### 進入chroot環境進行配置
+
+>若您使用的是EOS的Live ISO，請把`/etc/pacman.conf`中的EOS Repository刪除
+
+**安裝程式包**
+
+執行
+```sh
+pacman -S fcitx5 fcitx5-chinese-addons kcm-fcitx5 fcitx5-qt fcitx5-gtk ttf-sarasa-gothic
+```
+
+完成後，按下`Control`和`D`，回到Live ISO環境
+執行
+```sh
+reboot
+```
+以重新開機
+
+### 安裝後配置

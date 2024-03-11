@@ -35,7 +35,7 @@ sudo python ./envycontrol.py -s hybrid
 ```sh
 sudo python ./envycontrol.py -s hybrid --rtd3
 ```
-按照Envycontrol文檔，對於使用Ampere架構（RTX 30）或更新的GPU，應執行
+按照envycontrol文檔，對於使用Ampere架構（RTX 30）或更新的GPU，應執行
 ```sh
 sudo python ./envycontrol.py -s hybrid --rtd3 3
 ```
@@ -45,23 +45,16 @@ sudo python ./envycontrol.py -s hybrid --rtd3 3
 ## NVIDIA GPU能耗問題
 
 ### 使用`envycontrol`關閉NVIDIA GPU
-回到Envycontrol源碼資料夾，執行
+回到envycontrol源碼資料夾，執行
 ```sh
 sudo python ./envycontrol.py -s integrated
 ```
 重新開機以套用變更，關閉NVIDIA GPU，僅使用Intel Integrated GPU。
 
 ### 變更X11配置檔案以使得X Server執行於Intel Integrated GPU
->注意：該過程需要關閉圖形界面（即進入多使用者模式）。
+>注意：該方法僅適用於不連接外部監視器的使用場景。該過程需要關閉圖形界面（即進入多使用者模式）。
 
 >該方法對於Ada Lovelace架構（RTX 40）的GPU效果並不明顯，因爲透過`envycontrol`設定混合輸出並使用RTD3時已以較低能耗運作。對Ampere架構（RTX 30）的GPU效果較明顯。
-
-確保已安裝Intel Graphics驅動程式`xf86-video-intel`
-
-執行
-```sh
-sudo pacman -S xf86-video-intel
-```
 
 設定systemd開機進入多使用者模式
 
@@ -80,10 +73,8 @@ sudo nano /usr/share/X11/xorg.conf.d/20-intel.conf
 
 寫入以下内容：
 ```
-Section "Device"
-  Identifier "Intel Graphics"
-  Driver "Intel"
-  Option "DRI" "3"
+Section "ServerFlags"
+  Option "AutoAddGPU" "off"
 EndSection
 ```
 按下`Control`和`X`，輸入`Y`以寫入，再按下`Enter`以先前指定的檔案名保存
@@ -96,4 +87,4 @@ sudo systemctl set-default graphical.target
 ```
 並重新開機
 
-登入系統后可以透過`nvidia-smi`或`nvtop`檢查NVIDIA GPU狀態
+登入系統后可以透過`nvidia-smi`或`nvtop`檢查NVIDIA GPU狀態，可以發現Xorg的進程已不在NVIDIA GPU上執行
