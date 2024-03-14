@@ -157,7 +157,7 @@ timedatectl set-timezone Asia/Chongqing
 
 ## 於Live ISO環境執行作業系統的安裝
 
->此處要强調的是“Live ISO”環境，使用Arch Linux Live ISO并不是强制條件。因爲在Arch Linux Live ISO中有時候條件不充分，例如學生欲使用要求身份認證的校園網執行安裝作業，此時利用Endeavour OS的Live ISO或許更好。
+>此處要强調的是“Live ISO”環境，使用Arch Linux Live ISO并不是强制條件。因爲在Arch Linux Live ISO中有時候條件不充分，例如高校學生欲使用要求身份認證的校園網執行安裝作業，此時利用Endeavour OS的Live ISO或許更好。
 
 ### 使用Arch Linux的`archinstall`脚本執行安裝
 
@@ -287,8 +287,35 @@ nano /etc/pacman.d/mirrorlist
 
 執行
 ```sh
-pacman -S fcitx5 fcitx5-chinese-addons kcm-fcitx5 fcitx5-qt fcitx5-gtk ttf-sarasa-gothic
+pacman -S fcitx5 fcitx5-chinese-addons kcm-fcitx5 fcitx5-qt fcitx5-gtk ttf-sarasa-gothic snapper snap-pac
 ```
+
+**為NVIDIA GPU加入Kernel Parameters**
+
+執行
+```sh
+nano /etc/default/grub
+```
+
+找到
+```
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"
+```
+
+把`quiet`改爲`splash`，並於後方加入`nvidia.drm_modeset=1`
+
+即
+```
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 splash nvidia_drm.modeset=1"
+```
+
+儲存檔案變更
+
+執行
+```sh
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+```
+以套用變更
 
 完成後，按下`Control`和`D`，回到Live ISO環境
 執行
@@ -298,3 +325,4 @@ reboot
 以重新開機
 
 ### 安裝後配置
+
