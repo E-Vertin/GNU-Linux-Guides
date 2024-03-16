@@ -20,6 +20,36 @@ Numlock=on
 
 按下`Control`和`X`，輸入`Y`以寫入，再按下`Enter`以先前指定的檔案名保存。
 
+## 開啓`systemd`的某些服務
+
+`fstrim.timer`計時器會在每周激活服務，在所有已掛載的支持discard操作的文件系統上執行fstrim，此舉是通知磁碟主控使用演算法來將寫入作業平衡到整塊閃存上
+
+執行
+```sh
+sudo systemctl enable --now fstrim.timer
+```
+
+`nvidia-powerd.service`是動態管理NVIDIA GPU電源狀態的服務，啓用以優化NVIDIA GPU電源使用狀況
+
+執行
+```sh
+sudo systemctl enable --now nvidia-powerd.service
+```
+
+`nvidia-suspend.service`是通知NVIDIA GPU您執行了Suspend To RAM的服務，啓用以實現NVIDIA GNU/Linux Driver的Suspend
+
+（可選）`nvidia-resume.service`是通知NVIDIA GPU內核正在恢復先前狀態的服務，若您無法從掛起中喚醒，可以嘗試啓用
+
+執行
+```sh
+sudo systemctl enable nvidia-suspend.service
+```
+
+（可選）執行
+```sh
+sudo systemctl enable nvidia-resume.service
+```
+
 ## NVIDIA GPU的MUX Switch控制
 **若您的筆電支援NVIDIA Optimus，可透過`envycontrol`實用程式控制MUX Switch**
 
