@@ -1,7 +1,5 @@
 # Installation Guide for Arch Linux, An Arch Linux for EVERYONE!
 
-# TO BE ACCOMPLISHED
-
 ## 1. 歸檔並燒錄映像檔
 
 前往 [官方網站](https://endeavouros.com/#Download) 選擇鏡像並歸檔
@@ -232,6 +230,11 @@ nano /etc/pacman.d/mirrorlist
 
 加入欲使用的鏡像伺服器，按下`Control`和`O`寫入，按下`Enter`以使用原本的檔案名，再按下`Control`和`X`退出
 
+例如於頂部寫入
+```
+Server = https://mirrors.cernet.edu.cn/archlinux/$repo/os/$arch
+```
+
 **開始安裝**
 
 >注意：於`archinstall`中，*Mirrors*欄目應選取您所在地區的鏡像伺服器
@@ -287,8 +290,9 @@ nano /etc/pacman.d/mirrorlist
 
 執行
 ```sh
-pacman -S fcitx5 fcitx5-chinese-addons kcm-fcitx5 fcitx5-qt fcitx5-gtk ttf-sarasa-gothic snapper snap-pac
+pacman -S fcitx5 fcitx5-chinese-addons kcm-fcitx5 fcitx5-qt fcitx5-gtk ttf-sarasa-gothic snapper snap-pac power-profiles-daemon
 ```
+>注意：`power-profiles-daemon`爲Plasma桌面的電源計劃管理程式，您也可以使用`tlp`對其進行替換
 
 **為NVIDIA GPU加入Kernel Parameters**
 
@@ -326,3 +330,194 @@ reboot
 
 ### 安裝後配置
 
+#### 設定與Windows相同的時間標準
+
+```sh
+sudo timedatectl set-local-rtc 1 --adjust-system-clock
+```
+
+>注意：您也可以變更Windows的時間標準設定，此處不贅述
+
+#### 開啓`systemd`的某些服務
+
+`fstrim.timer`計時器會在每周激活服務，在所有已掛載的支持discard操作的文件系統上執行fstrim，此舉是通知磁碟主控使用演算法來將寫入作業平衡到整塊閃存上
+
+執行
+```sh
+sudo systemctl enable --now fstrim.timer
+```
+
+`nvidia-powerd.service`是動態管理NVIDIA GPU電源狀態的服務，啓用以優化NVIDIA GPU電源使用狀況
+
+執行
+```sh
+sudo systemctl enable --now nvidia-powerd.service
+```
+
+`nvidia-suspend.service`是通知NVIDIA GPU您執行了Suspend To RAM的服務，啓用以實現NVIDIA GNU/Linux Driver的Suspend
+
+（可選）`nvidia-resume.service`是通知NVIDIA GPU內核正在恢復先前狀態的服務，若您無法從掛起中喚醒，可以嘗試啓用
+
+執行
+```sh
+sudo systemctl enable nvidia-suspend.service
+```
+
+（可選）執行
+```sh
+sudo systemctl enable nvidia-resume.service
+```
+
+#### 加入archlinuxcn倉庫
+
+由於archlinuxcn倉庫並不在`pacman`所認可的範圍内，我們需要手動添加archlinuxcn倉庫及其位址。
+
+執行
+```sh
+sudo nano /etc/pacman.conf
+```
+以使用`nano`編輯`pacman`的配置檔案
+
+按下`Control`和`End`將光標移至檔案末尾，添加
+```
+[archlinuxcn]
+Server = https://repo.archlinuxcn.org/$arch
+```
+
+>中國大陸使用者可以使用大陸鏡像源，例如慾使用校園網聯合鏡像，可改爲
+```
+[archlinuxcn]
+Server = https://mirrors.cernet.edu.cn/archlinuxcn/$arch
+#Server = https://repo.archlinuxcn.org/$arch
+```
+
+執行
+```sh
+sudo pacman-key --lsign-key "farseerfc@archlinux.org"
+```
+以在本機添加對farseerfc的密鑰的信任
+
+隨即執行
+```sh
+sudo pacman -Sy archlinuxcn-keyring
+```
+以加入archlinuxcn倉庫的PGP密鑰
+
+（可選）安裝`archlinuxcn-mirrorlist-git`以獲得一份archlinuxcn鏡像列表，以便于`/etc/pacman.conf`中直接引入
+
+#### 啓用AUR倉庫
+
+`paru`是一個專注於功能的AUR包管理員
+
+- 透過archlinuxcn倉庫安裝
+
+執行
+```sh
+sudo pacman -S paru
+```
+
+- 同樣，您也可以自行安裝
+
+執行
+```sh
+sudo pacman -S --needed base-devel git
+```
+以安裝依賴項目
+
+執行
+>建議於`~`下執行，若您日後需要歸檔自己或他人的`git`，請於您慾進行歸檔管理的目錄下執行
+```sh
+git clone https://aur.archlinux.org/paru.git
+cd paru
+```
+
+編譯安裝`paru`
+
+執行
+```sh
+makepkg -si
+```
+
+#### 使用Snapper對作業系統進行快照備份
+
+**安裝Snapper及其附加程式**
+
+執行
+```sh
+sudo pacman -S snapper snap-pac btrfs-assistant
+```
+
+**配置Snapper對`/`進行快照備份**
+
+執行`btrfs-assistant`
+
+- 於*Snapper Settings*欄建立對於`/`的設定檔
+- 套用`systemd`的服務
+- 變更*Timeline*自動快照的設定
+
+設定`snap-pac`的`pacman`掛鉤
+
+`snap-pac`的配置檔案爲`/etc/snap-pac.ini`
+
+執行
+```sh
+sudo nano /etc/snap-pac.ini
+```
+
+請認真閱讀該檔案中的註釋並按需修改！
+
+#### 啓用防火牆
+
+`firewalld`是一個動態管理的防火牆，支持使用區域來標識網絡連接/接口的可信等級。支持 IPv4、IPv6 防火牆設置、以太網橋接和 IP sets。使用分離的運行時配置和永久設置。也提供了一個接口用來直接為服務或應用添加防火牆規則。
+
+**安裝`firewalld`**
+
+執行
+```sh
+sudo pacman -S firewalld
+```
+
+**啓用服務**
+```sh
+sudo systemctl enable --now firewalld
+```
+
+此時，可於 *System Settings > Wi-Fi & Networking > Firewall* 中存取防火牆設定
+
+#### 啓用`AppArmor`
+
+`apparmor`是內核的一個安全模塊，實現的功能與`SELinux`類似，管理每個程式的存取行爲
+
+**安裝`apparmor`**
+
+執行
+```sh
+sudo pacman -S apparmor
+```
+
+**啓用服務**
+
+執行
+```sh
+sudo systemctl enable apparmor
+```
+
+**要求內核啓動載入模塊**
+
+- 使用`grub`啓動載入器
+  
+  編輯`/etc/default/grub`
+
+  於行
+  ```
+  GRUB_CMDLINE_LINUX_DEFAULT=
+  ```
+
+  後方的引號中加入
+  ```
+  lsm=landlock,yama,integrity,apparmor,bpf
+  ```
+
+  不啓用內核Lockdown功能是因爲使用了閉源的NVIDIA GNU/Linux Driver
+
+**本手冊僅供新手參考，欲進行更多自訂設定，請自行探索，當然，別忘了BTRFS備份**
