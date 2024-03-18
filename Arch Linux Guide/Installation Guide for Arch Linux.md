@@ -518,6 +518,31 @@ sudo systemctl enable apparmor
   lsm=landlock,yama,integrity,apparmor,bpf
   ```
 
-  不啓用內核Lockdown功能是因爲使用了閉源的NVIDIA GNU/Linux Driver
+- 不啓用內核Lockdown功能是因爲使用了閉源的NVIDIA GNU/Linux Driver
+
+#### 關於NVIDIA GPU上的Xorg進程
+
+若您需要把Xorg Server進程遷移至Intel GPU，請於`/etc/X11/xorg.conf.d/`中建立設定檔案
+
+例如：
+
+執行
+```sh
+sudo nano /etc/X11/xorg.conf.d/20-force-intel.conf
+```
+
+寫入
+```
+Section "ServerFlags"
+  Option "AutoAddGPU" "off"
+EndSection
+```
+
+保存後，執行
+
+```sh
+sudo Xorg -configure
+```
+以套用變更
 
 **本手冊僅供新手參考，欲進行更多自訂設定，請自行探索，當然，別忘了BTRFS備份**
