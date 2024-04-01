@@ -289,6 +289,8 @@ Server = https://mirrors.cernet.edu.cn/archlinux/$repo/os/$arch
 對於*Additional packages*，可以加入：
 `firefox` `nano` `fish`
 
+對於*Profile*，建議選取KDE Plasma桌面環境
+
 選取*Install*以執行安裝
 
 ### 進入chroot環境進行配置
