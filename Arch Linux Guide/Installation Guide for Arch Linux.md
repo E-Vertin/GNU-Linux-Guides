@@ -165,7 +165,7 @@ timedatectl set-timezone Asia/Chongqing
 ```sh
 pacman -Sy archinstall
 ```
->`pacman`是Arch Linux所使用的包管理員，`-Sy`即要求與遠端（伺服器）進行同步化處理並重新整理本機資料庫，此處可簡單理解爲“重新本機資料庫並安裝`archinstall`”
+>`pacman`是Arch Linux所使用的包管理員，`-Sy`即要求與遠端（伺服器）進行同步化處理並重新整理本機資料庫，此處可簡單理解爲“重新整理本機資料庫並安裝`archinstall`”
 
 `archinstall`是一個全自動的Arch Linux安裝脚本，提供了使用者以填寫問卷的形式執行安裝作業。
 
