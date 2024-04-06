@@ -12,7 +12,7 @@
 
 | 發行版 | 簡介 | 指南 |
 | --- | --- | --- |
-| [Endeavour OS](#endeavour-os) | [EndeavourOS](https://endeavouros.com/) 是一個基於 Arch 的發行版，為 x86_64 和 ARM 系統提供了 Arch 的體驗，無需複雜的手動安裝。因其更易于安装且更加贴近其上游（Arch Linux），所以对于将来欲使用Arch Linux的使用者是接触、熟悉Arch Linux的不二之选。 | [安裝指南](EOS%20Guide/Installation%20Guide%20for%20Endeavour%20OS%2C%20A%20Distro%20Based%20On%20archlinux.md), [進階指南](EOS%20Guide/Advanced%20Guide%20for%20Endeavour%20OS.md) |
+| [Endeavour OS](#endeavour-os) | [EndeavourOS](https://endeavouros.com/) 是一個基於 Arch 的發行版，為 x86_64 和 ARM 系統提供了 Arch 的體驗，無需複雜的手動安裝。因其更易於安裝且更貼近其上游（Arch Linux），所以對於將來欲使用Arch Linux的使用者是接觸、熟悉Arch Linux的不二之選。 | [安裝指南](EOS%20Guide/Installation%20Guide%20for%20Endeavour%20OS%2C%20A%20Distro%20Based%20On%20archlinux.md), [進階指南](EOS%20Guide/Advanced%20Guide%20for%20Endeavour%20OS.md) |
 | [Arch Linux](#arch-linux) | [Arch Linux](https://www.archlinux.org/) 是一個輕量級和靈活的 Linux 發行版，欲保持簡單。它基於滾動發行系統，允許您安裝一次並永遠更新。Arch 是一個適合中高級用戶的優秀發行版，其欲成爲具有最新軟件的極簡系統。 | [安裝指南](Arch%20Linux%20Guide/Installation%20Guide%20for%20Arch%20Linux.md) |
 
 ### Endeavour OS
@@ -21,7 +21,7 @@
 > 
 > [EndeavourOS](https://endeavouros.com/) 是一個基於 Arch 的發行版，為 x86_64 和 ARM 系統提供了 Arch 的體驗，無需複雜的手動安裝。
 
-因其更易于安装且更加贴近其上游（Arch Linux），所以对于将来欲使用Arch Linux的使用者是接触、熟悉Arch Linux的不二之选。
+因其更易於安裝且更貼近其上游（Arch Linux），所以對於將來欲使用Arch Linux的使用者是接觸、熟悉Arch Linux的不二之選。
 
 - [安裝指南](EOS%20Guide/Installation%20Guide%20for%20Endeavour%20OS%2C%20A%20Distro%20Based%20On%20archlinux.md)
 - [進階指南](EOS%20Guide/Advanced%20Guide%20for%20Endeavour%20OS.md)
