@@ -13,7 +13,7 @@ The guides are written by contributors, and are mainly based on our experience t
 | Distribution | Introduction | Guides |
 | --- | --- | --- |
 | [Endeavour OS](#endeavour-os) | [EndeavourOS](https://endeavouros.com/) is an Arch-based distro that provides an Arch experience without the hassle of installing it manually for both x86_64 and ARM systems. | [Installation Guide](EOS%20Guide/Installation%20Guide%20for%20Endeavour%20OS%2C%20A%20Distro%20Based%20On%20archlinux.md), [Advanced Guide](EOS%20Guide/Advanced%20Guide%20for%20Endeavour%20OS.md) |
-| [Arch Linux](#arch-linux) | [Arch Linux](https://www.archlinux.org/) is a lightweight and flexible Linux distribution that tries to "Keep It Simple". It is based on a rolling-release system, which allows you to install once and get future updates without reinstalling the whole OS. Arch is an excellent distribution that suits users who have certain understanding and experience in using GNU/Linux well, especially for those who want a minimal system with the latest software. | [Installation Guide](Arch%20Linux%20Guide/Installation%20Guide%20for%20Arch%20Linux.md) |
+| [Arch Linux](#arch-linux) | [Arch Linux](https://www.archlinux.org/) is a lightweight and flexible Linux distribution that tries to "Keep It Simple". It is based on a rolling-release system, which allows you to install once and get future updates without reinstalling the whole OS. Arch is an excellent distribution that suits users who have certain understanding and experience in using GNU/Linux well, especially for those who want a minimal system setup with the latest software. | [Installation Guide](Arch%20Linux%20Guide/Installation%20Guide%20for%20Arch%20Linux.md) |
 
 ### Endeavour OS
 
