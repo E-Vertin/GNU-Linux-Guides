@@ -371,8 +371,8 @@ mount /dev/Arch/root -o subvol=@,compress=zstd /mnt
 ```sh
 cd /mnt
 mkdir boot home
-mkdir -p /var/log
-mkdir -p /var/cache/pacman/pkg
+mkdir -p ./var/log
+mkdir -p ./var/cache/pacman/pkg
 ```
 
 掛載所有分割區
