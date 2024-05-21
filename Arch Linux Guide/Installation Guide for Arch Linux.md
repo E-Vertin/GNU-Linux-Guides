@@ -151,27 +151,7 @@ timedatectl set-timezone Asia/Chongqing
 ```
 此時選取的是CST (UTC+8)
 
-#### 至此，您已準備好執行安裝作業。
-
-## 於Live ISO環境執行作業系統的安裝
-
->此處要强調的是“Live ISO”環境，使用Arch Linux Live ISO并不是强制條件。因爲在Arch Linux Live ISO中有時候條件不充分，例如高校學生欲使用要求身份認證的校園網執行安裝作業，此時利用Endeavour OS的Live ISO或許更好。
-
-### 使用Arch Linux的`archinstall`脚本執行安裝
-
-爲確保安裝作業順利進行，請使用最新版本的`archinstall`
-
-執行
-```sh
-pacman -Sy archinstall
-```
->`pacman`是Arch Linux所使用的包管理員，`-Sy`即要求與遠端（伺服器）進行同步化處理並重新整理本機資料庫，此處可簡單理解爲“重新整理本機資料庫並安裝`archinstall`”
-
-`archinstall`是一個全自動的Arch Linux安裝脚本，提供了使用者以填寫問卷的形式執行安裝作業。
-
->注意：鑒於`archinstall`提供的磁碟分割工具較難使用，此處先使用`cfdisk`編輯磁碟分割表，再進入`archinstall`程式執行安裝
-
-#### 準備磁碟
+### 準備磁碟
 
 **首先，我們需要檢查磁碟裝置**
 ```sh
@@ -210,7 +190,7 @@ cfdisk /dev/sda
 執行完分割表編輯后，以60G的磁碟爲例，所得結果可以是這樣的：
 | `/dev/sda` | Size | Type |
 |-|-|-|
-`/dev/sda1` | 500M | EFI System |
+`/dev/sda1` | 0.5G | EFI System |
 `/dev/sda2` | 40G | Linux root (x86-64) |
 `/dev/sda3` | 19.5G | Linux home |
 
@@ -228,7 +208,7 @@ mkfs.f2fs /dev/sda3 -f -l Home
 >`mkfs`是用於在磁碟分割區中建立檔案系統的命令
 
 
-**在使用`archinstall`執行安裝作業前，請檢查鏡像列表**
+**在使用執行安裝作業前，請檢查鏡像列表**
 
 執行
 ```sh
@@ -243,6 +223,26 @@ Server = https://mirrors.cernet.edu.cn/archlinux/$repo/os/$arch
 ```
 
 欲進一步瞭解該鏡像，請前往其 [官方網站](https://mirrors.cernet.edu.cn/about)
+
+#### 至此，您已準備好執行安裝作業。
+
+## 於Live ISO環境執行作業系統的安裝
+
+>此處要强調的是“Live ISO”環境，使用Arch Linux Live ISO并不是强制條件。因爲在Arch Linux Live ISO中有時候條件不充分，例如高校學生欲使用要求身份認證的校園網執行安裝作業，此時利用Endeavour OS的Live ISO或許更好。
+
+### 使用Arch Linux的`archinstall`脚本執行安裝
+
+>注意：慾進行更多自訂，請查閱下文的手動安裝
+
+爲確保安裝作業順利進行，請使用最新版本的`archinstall`
+
+執行
+```sh
+pacman -Sy archinstall
+```
+>`pacman`是Arch Linux所使用的包管理員，`-Sy`即要求與遠端（伺服器）進行同步化處理並重新整理本機資料庫，此處可簡單理解爲“重新整理本機資料庫並安裝`archinstall`”
+
+`archinstall`是一個全自動的Arch Linux安裝脚本，提供了使用者以填寫問卷的形式執行安裝作業。
 
 **開始安裝**
 
@@ -263,7 +263,8 @@ Server = https://mirrors.cernet.edu.cn/archlinux/$repo/os/$arch
 | name | mountpoint | compress | nodatacow |
 |-|-|-|-|
 `@` | `/` | True | False |
-`@var` | `/var` | False | True |
+`@log` | `/var/log` | False | True |
+`@pkg` | `/var/cache/pacman/pkg` | False | True |
 
 其他設定可以依照個人偏好設定
 | Options | Description |
@@ -293,9 +294,253 @@ Server = https://mirrors.cernet.edu.cn/archlinux/$repo/os/$arch
 
 選取*Install*以執行安裝
 
-### 進入chroot環境進行配置
+### 手動安裝Arch Linux
 
->若您使用的是EOS的Live ISO，請務必首先把`/etc/pacman.conf`中的EOS Repository刪除
+>`archinstall`提供了包辦式的安裝，但手動安裝始終能提供更靈活的自訂選項，此處以使用LVM和systemd-boot啟動Unified Kernel Image為例
+
+#### 準備LVM
+
+回到上文使用`cfdisk`進行分割表編輯，我們可以在磁碟上只劃分兩個分割，一個`/boot`，一個作為LVM的物理卷
+
+對於`/dev/sda1`，請抹除為FAT32檔案系統
+
+對於`/dev/sda2`，我們需要建立LVM2 Physical Volume
+
+```sh
+pvcreate /dev/sda2
+```
+
+>`pvcreate`意為“創建Physical Volume“，並指定一個磁碟分割
+
+隨後，建立Volume Group
+
+```sh
+vgcreate Arch /dev/sda2
+```
+
+>`vgcreate`意為“創建Volume Group”，賦予名稱（此處名為Arch），並指定一個或多個已作為LVM Physical Volume使用的磁碟分割
+
+最後，建立Logical Volume
+
+```sh
+lvcreate -L 40G Arch -n root
+lvcreate -l 100%FREE Arch -n home
+```
+
+>`lvcreate`意為“創建Logical Volume”，於某個Volume Group中分配具體的或按百分比計算的餘下的空間給某個Logical Volume並賦予該lv名稱
+
+#### 於LVM中建立檔案系統
+
+>LVM中的Logical Volume是被映射至Volume Group裝置中的分割
+
+慾根目錄使用btrfs以及家目錄使用f2fs，請執行
+
+```sh
+mkfs.btrfs /dev/Arch/root
+mkfs.f2fs /dev/Arch/home
+```
+
+**建立btrfs子卷**
+
+將整個btrfs容器掛載至`/mnt`
+
+```sh
+mount /dev/Arch/root /mnt
+```
+
+於容器中建立子卷
+
+```sh
+cd /mnt
+btrfs subvolume create @
+btrfs subvolume create @log
+btrfs subvolume create @pkg
+cd && umount /mnt
+```
+
+**掛載分割區**
+
+我們需要先掛載用作新系統的根目錄的btrfs子卷
+
+```sh
+mount /dev/Arch/root -o subvol=@,compress=zstd /mnt
+```
+
+於新系統的根目錄中建立其他分割的掛載點
+
+```sh
+cd /mnt
+mkdir boot home
+mkdir -p /var/log
+mkdir -p /var/cache/pacman/pkg
+```
+
+掛載所有分割區
+
+```sh
+mount /dev/sda1 /mnt/boot
+mount /dev/Arch/home /mnt/home
+mount /dev/Arch/root -o subvol=@log,nodatacow /mnt/var/log
+mount /dev/Arch/root -o subvol=@pkg,nodatacow /mnt/var/cache/pacman/pkg
+```
+
+請執行`lsblk`再次檢查，確保所有分割區已掛載
+
+#### 安裝基礎系統包
+
+>`pacstrap`是Arch Linux所使用的“播種器”
+
+```sh
+pacstrap -K /mnt base base-devel linux-firmware linux linux-headers nano fish dhcpcd dhclient networkmanager btrfs-progs f2fs-tools dosfstools lvm2
+```
+
+對於Intel CPU，還需要安裝`intel-ucode`
+對於AMD CPU，還需要安裝`amd-ucode`
+
+>若需要使用`linux-zen`內核，請替換`linux` `linux-headers`為`linux-zen` `linux-zen-headers`
+
+#### 建立新系統的檔案系統表格
+
+>Arch Linux使用`genfstab`，相較於Gentoo Linux的手動編寫，這是相當方便的
+
+```sh
+cd
+genfstab -U /mnt > /mnt/etc/fstab
+```
+
+此處我們需要再次變更`/mnt/etc/fstab`的內容
+
+```sh
+nano /mnt/etc/fstab
+```
+
+把掛載點為`/var/log`和`/var/cache/pacman/pkg`的分割區的掛載選項中的`compress=zstd`改為`nodatacow`
+
+**使用fstrim.service進行排程TRIM**
+
+對於btrfs，請刪除選項中的`discard`項目
+
+對於f2fs,請將`discard`改為`nodiscard`
+
+#### 進入chroot環境配置
+
+>Arch Linux使用`arch-chroot`自動化程式
+
+```sh
+arch-chroot /mnt
+```
+
+**設定當地時間**
+
+```sh
+ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
+```
+
+**設定主機名**
+
+```sh
+nano /etc/hostname
+```
+
+並於首行輸入主機名
+
+**設定慾使用的locale**
+
+```sh
+nano /etc/locale.gen
+```
+
+將慾使用的locale反註釋並生成
+
+```sh
+locale-gen
+```
+
+**安裝必要程式、驅動程式以及KDE Plasma**
+
+```sh
+pacman -Sy openssh htop wget iwd wireless_tools wpa_supplicant smartmontools xdg-utils plasma-meta plasma-workspace ark dolphin konsole egl-wayland pipewire pipewire-alsa pipewire-jack pipewire-pulse gst-plugin-pipewire libpulse wireplumber sddm
+```
+
+對於Intel GPU及NVIDIA GPU的Hybrid配置
+
+```sh
+pacman -S mesa intel-media-driver libva-intel-driver vulkan-intel xorg-server xorg-xinit nvidia-dkms
+```
+
+**配置Unified Kernel Image**
+
+>Arch Linux預設使用`mkinitcpio`建立initramfs
+
+建立Unified Kernel Image存放位址
+
+```sh
+mkdir -p /boot/EFI/Linux
+```
+
+變更`mkinitcpio`設定
+
+```sh
+nano /etc/mkinitcpio.conf
+```
+
+於已啟用的HOOKS預設檔案中加入 `lvm2`
+
+```sh
+nano /etc/mkinitcpio.d/linux.preset
+```
+
+註釋`default_image`與`fallback_image`項目
+
+反註釋`default_uki`與`fallback_uki`項目，並將其存放分割區改為`/boot`
+
+```sh
+mkdir /etc/cmdline.d
+nano /etc/cmdline.d/root.conf
+```
+
+指定根目錄的掛載選項
+
+```
+root=/dev/Arch/root rootflags=subvol=@ rootfstype=btrfs rw
+```
+
+隨後執行
+
+```sh
+mkinitcpio -P
+```
+
+建立Unified Kernel Image
+
+**安裝systemd-boot啟動載入器**
+
+```sh
+bootctl install
+```
+
+執行
+```sh
+nano /boot/loader/loader.conf
+```
+
+反註釋`timeout`與`console-mode`
+
+加入
+
+```
+auto-entries yes
+editor yes
+```
+
+執行
+```sh
+bootctl list
+```
+
+以檢查啟動項目
+
+>若您使用的是EOS的Live ISO，請務必把`/etc/pacman.conf`中的EOS Repository刪除
 
 **安裝程式包**
 
@@ -303,9 +548,11 @@ Server = https://mirrors.cernet.edu.cn/archlinux/$repo/os/$arch
 ```sh
 pacman -S fcitx5 fcitx5-chinese-addons kcm-fcitx5 fcitx5-qt fcitx5-gtk ttf-sarasa-gothic snapper snap-pac power-profiles-daemon
 ```
->注意：`power-profiles-daemon`爲Plasma桌面的電源計劃管理程式，您也可以使用`tlp`對其進行替換
+>注意：`power-profiles-daemon`爲Plasma桌面的電源計劃管理程式，您也可以使用`tlp`對其進行替換，在進入新系統前請啟用服務
 
 **為NVIDIA GPU加入Kernel Parameters**
+
+對於grub載入器
 
 執行
 ```sh
@@ -334,12 +581,32 @@ sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 >此處即使得`grub`套用變更並將最終的配置檔案輸出至`/boot/grub/grub.cfg`
 
+對於systemd-boot啟動的UKI
+
+```sh
+nano /etc/cmdline.d/nvidia.conf
+```
+
+輸入
+
+```
+nvidia_drm.modeset=1
+```
+
+再次執行
+```sh
+mkinitcpio -P
+```
+以重新建立UKI
+
 完成後，按下`Control`和`D`，回到Live ISO環境
+
 執行
+
 ```sh
 reboot
 ```
-以重新開機
+以重新開機，並於開機中選擇`UEFI OS`以啟動Arch Linux
 
 ### 安裝後配置
 
