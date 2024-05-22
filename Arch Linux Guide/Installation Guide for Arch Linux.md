@@ -599,6 +599,42 @@ mkinitcpio -P
 ```
 以重新建立UKI
 
+**建立使用者賬戶**
+
+執行
+```sh
+passwd
+```
+以變更root的密碼
+
+執行
+```sh
+useradd -m -s /usr/bin/fish 使用者名稱
+```
+以建立自己的使用者賬戶
+
+> 此處使用`useradd`新增使用者賬戶，`-m`即於`/home`建立該使用者的家目錄，`-s`為選取登入的Shell，建議使用`fish`
+
+**允許使用者賬戶使用`sudo`**
+
+> `sudo`是GNU/Linux上最常用的暫時賦予使用者管理員權限的工具
+
+執行
+```sh
+nano /etc/sudoers
+```
+
+於
+```
+root ALL=(ALL:ALL) ALL
+```
+下行加入
+```
+使用者名稱 ALL=(ALL:ALL) ALL
+```
+
+寫入該檔案並按原檔案名儲存
+
 完成後，按下`Control`和`D`，回到Live ISO環境
 
 執行
