@@ -8,7 +8,7 @@
 
 ## 2. 變更 UEFI BIOS 設定並載入 ISO
 
->此處要强調的是 “Arch 的 Live ISO” 環境，使用 Arch Linux Install Medium ISO 并不是强制條件。因爲在此 ISO 中有條件不一定充分，例如高校學生欲使用要求身份認證的校園網執行安裝作業，此時利用 Endeavour OS 的 Live ISO 或許更好。
+>此處要强調的是 Arch 的 “Live ISO” 環境，使用 Arch Linux Install Medium ISO 并不是强制條件。因爲在此 ISO 中有條件不一定充分，例如高校學生欲使用要求身份認證的校園網執行安裝作業，此時利用 Endeavour OS 的 Live ISO 或許更好。
 
 ### ASUS:
 
@@ -32,9 +32,11 @@ localectl list-keymaps
 >此舉是列出所有可用的鍵盤格式。
 
 >注意：您可以使用 pipe 輸出至 `grep` 以篩選輸出結果，例如執行此命令以篩選美式鍵盤及其變種。
+
 ```sh
 localectl list-keymaps | grep us
 ```
+
 預設的鍵盤格式是 English (US)，請按需變更設定。
 
 ### 選取 Console 所使用的字體
@@ -62,6 +64,8 @@ ip link
 
 欲使用 WLAN 或 WWAN（即無綫介面卡），請透過 `rfkill` 檢查介面卡的封鎖狀態。
 
+> `rfkill` 是 `systemd` init 程式的無綫介面卡控制程式
+
 執行
 ```sh
 rfkill list
@@ -88,13 +92,15 @@ rfkill unblock 0
 ```
 以解除對 WLAN 介面卡的封鎖。
 
-此時，我們可以嘗試連接至 Internet。
+至此，我們可以嘗試連接至 Internet。
 
 #### 對於乙太網路，請檢查綫纜是否穩定地插入 LAN 埠。
 
-#### 對於 WLAN，請使用 `iwctl` 進行認證。
+#### 對於 WLAN，請使用 `iwctl` 或 `nmtui` 進行認證。
 
-例如：
+> `iwctl` 是 `iwd` (iNet Wireless Daemon) 的 CLI 程式；`nmtui` 是 `NetworkManager` 的 TUI 程式，使用起來更友好
+
+使用 `iwctl`，例如：
 
 執行
 ```sh
@@ -118,6 +124,19 @@ iwctl
 >`<Name>` 即介面卡的名稱， `<SSID>` 即 WLAN 的名稱。
 
 提示 `Passphrase:` 時輸入密碼即可連接。
+
+使用 `nmtui`，例如：
+
+執行
+```sh
+nmtui
+```
+
+於選單中選取 `Activate a connection`
+
+隨後，於次級選單中選擇一個 WLAN SSID 並輸入密碼進行認證
+
+最後退出
 
 #### 對於流動寬頻調解器，請使用 mmcli。
 >注意：鑒於流動寬頻調節器在當今相對罕見，此處便不再贅述。（附上[Wiki連結](https://wiki.archlinux.org/title/Mobile_broadband_modem#ModemManager)）
@@ -192,7 +211,7 @@ cfdisk /dev/sda
 ```
 即可進入 `cfdisk` 實用程式以編輯 `/dev/sda` 裝置的磁碟分割表
 
->注意：由於 Arch Linux 會把 vmlinuz 與 ucode 鏡像檔存放於`/boot`，建議該分割不小於 500M，若要使用多個内核，請按需分配
+>注意：由於 Arch Linux 會把 vmlinuz （亦稱 bzImage）内核映像檔存放於 `/boot`，建議該分割不小於 500M，若要使用多個内核，請按需分配
 
 執行完分割表編輯后，以 60G 的磁碟爲例，所得結果可以是這樣的：
 | `/dev/sda` | Size | Type |
@@ -305,9 +324,15 @@ pacman -Sy archinstall
 
 #### 準備 LVM
 
+> LVM (Logical Volume Manager) 利用内核的裝置映射實現對儲存裝置虛擬化，在一個抽象出來的裝置中建立並使用虛擬磁碟分割，可以更加簡便地實現磁碟分割調整，例如不再需要擔心磁碟的連續空間
+
 回到上文使用 `cfdisk` 進行分割表編輯，我們可以在磁碟上只劃分兩個分割，一個 `/boot`，一個作為 LVM 的物理卷
 
 對於 `/dev/sda1`，請抹除為 FAT32 檔案系統
+
+```sh
+mkfs.fat -F32 /dev/sda1
+```
 
 對於 `/dev/sda2`，我們需要建立 LVM2 Physical Volume
 
@@ -315,7 +340,7 @@ pacman -Sy archinstall
 pvcreate /dev/sda2
 ```
 
->`pvcreate` 意為“建立 Physical Volume ”，並指定一個磁碟分割
+>`pvcreate` 意為“建立 Physical Volume”，並指定一個磁碟分割
 
 隨後，建立 Volume Group
 
@@ -323,7 +348,7 @@ pvcreate /dev/sda2
 vgcreate Arch /dev/sda2
 ```
 
->`vgcreate` 意為“建立 Volume Group ”，賦予名稱（此處名為 Arch），並指定一個或多個已作為 LVM Physical Volume 使用的磁碟分割
+>`vgcreate` 意為“建立 Volume Group”，賦予名稱（此處名為 Arch），並指定一個或多個已作為 LVM Physical Volume 使用的磁碟分割
 
 最後，建立 Logical Volume
 
@@ -338,7 +363,7 @@ lvcreate -l 100%FREE Arch -n home
 
 >LVM 中的 Logical Volume 是被映射至 Volume Group 裝置中的分割
 
-慾根目錄使用 btrfs 以及家目錄使用 f2fs，請執行
+此處以根目錄使用 btrfs 以及家目錄使用 f2fs 檔案系統爲例：
 
 ```sh
 mkfs.btrfs /dev/Arch/root
@@ -389,14 +414,14 @@ mount /dev/Arch/root -o subvol=@log,nodatacow /mnt/var/log
 mount /dev/Arch/root -o subvol=@pkg,nodatacow /mnt/var/cache/pacman/pkg
 ```
 
-請執行 `lsblk` 再次檢查，確保所有分割區已掛載
+請執行 `lsblk` 再次檢查，確保所有分割區已正確掛載
 
 #### 安裝基礎系統包
 
->`pacstrap` 是 Arch Linux 所使用的“播種器”
+>`pacstrap` 是 Arch Linux 所使用的“播種器”，為整個系統建立樹狀檔案結構並安裝一些必需的包，例如包管理員
 
 ```sh
-pacstrap -K /mnt base base-devel linux-firmware linux linux-headers nano fish dhcpcd dhclient networkmanager btrfs-progs f2fs-tools dosfstools lvm2
+pacstrap -K /mnt base base-devel linux-firmware linux linux-headers nano fish networkmanager btrfs-progs f2fs-tools dosfstools lvm2
 ```
 
 對於 Intel CPU，還需要安裝 `intel-ucode`
@@ -413,7 +438,7 @@ cd
 genfstab -U /mnt > /mnt/etc/fstab
 ```
 
-此處我們需要再次變更 `/mnt/etc/fstab` 的內容
+此處我們需要再次檢查 `/mnt/etc/fstab` 的內容
 
 ```sh
 nano /mnt/etc/fstab
@@ -423,13 +448,13 @@ nano /mnt/etc/fstab
 
 **使用 fstrim.timer 進行排程TRIM**
 
-對於 btrfs，請刪除選項中的 `discard` 項目
+對於 btrfs，請刪除 `/mnt/etc/fstab` 挂載選項中的 `discard` 項目
 
-對於 f2fs,請將 `discard` 改為 `nodiscard`
+對於 f2fs，請將 `/mnt/etc/fstab` 中的挂載選項的 `discard` 改為 `nodiscard`
 
 #### 進入 chroot 環境配置
 
->Arch Linux 使用 `arch-chroot` 自動化程式
+>Arch Linux 使用 `arch-chroot` 自動化程式，此舉是“切換根目錄”，即以 root 身份登入新系統
 
 ```sh
 arch-chroot /mnt
@@ -441,19 +466,27 @@ arch-chroot /mnt
 ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
 ```
 
+>`ln -sf` 是建立一個名爲 `/etc/localtime` 的軟鏈接，且該鏈接指向 `/usr/share/zoneinfo/Asia/Hong_Kong`
+
 **設定主機名**
 
 ```sh
 nano /etc/hostname
 ```
 
-並於首行輸入主機名
+並於首行輸入主機名，可以按照 `<使用者>-<作業系統>-<裝置型號或牌子>`的格式命名，例如
+
+```
+Jimmy-Arch-SP5
+```
 
 **設定慾使用的 locale**
 
 ```sh
 nano /etc/locale.gen
 ```
+
+>此處建議在反注釋 `en_US.UTF-8 UTF-8` 的基礎上再反注釋 `zh_CN.UTF-8 UTF-8` 以及 `zh_HK.UTF-8 UTF-8`
 
 將慾使用的 locale 反註釋並生成
 
@@ -475,7 +508,7 @@ pacman -S mesa intel-media-driver libva-intel-driver vulkan-intel xorg-server xo
 
 **配置 Unified Kernel Image**
 
->Arch Linux 預設使用 `mkinitcpio` 建立 initramfs
+>Arch Linux 預設使用 `mkinitcpio` 建立 initramfs 映像檔
 
 建立 Unified Kernel Image 存放資料夾
 
@@ -491,20 +524,32 @@ nano /etc/mkinitcpio.conf
 
 於已啟用的 HOOKS 預設檔案中加入 `lvm2`
 
+變更内核包的映像檔建立設定
+
 ```sh
 nano /etc/mkinitcpio.d/linux.preset
 ```
 
 註釋 `default_image` 與 `fallback_image` 項目
 
-反註釋 `default_uki` 與 `fallback_uki` 項目，並將其存放分割區改為 `/boot`
+反註釋 `default_uki` 與 `fallback_uki` 項目，並將其存放分割區由 `/efi/EFI/Linux/<包名稱>.efi` 改為 `/boot/EFI/Linux/<包名稱>.efi`
+
+最後，設定内核啓動要執行的命令
 
 ```sh
 mkdir /etc/cmdline.d
+
+```
+
+> `mkinitcpio` 在建立映像檔時會使用 `/etc/cmdline.d/` 中的配置檔案，可以分類管理
+
+指定根目錄的掛載選項
+
+```sh
 nano /etc/cmdline.d/root.conf
 ```
 
-指定根目錄的掛載選項
+寫入
 
 ```
 root=/dev/Arch/root rootflags=subvol=@ rootfstype=btrfs rw
@@ -516,7 +561,7 @@ root=/dev/Arch/root rootflags=subvol=@ rootfstype=btrfs rw
 mkinitcpio -P
 ```
 
-建立 Unified Kernel Image
+以建立 Unified Kernel Image
 
 **安裝 systemd-boot 啟動載入器**
 
@@ -529,7 +574,7 @@ bootctl install
 nano /boot/loader/loader.conf
 ```
 
-反註釋 `timeout` 與 `console-mode`
+反註釋 `timeout 3` 與 `console-mode keep`
 
 加入
 
@@ -545,9 +590,9 @@ bootctl list
 
 以檢查啟動項目
 
->若您使用的是 EOS 的 Live ISO，請務必把 `/etc/pacman.conf` 中的 EOS Repository 刪除
-
 **安裝程式包**
+
+>若您使用的是 EOS 的 Live ISO，請務必把 `/etc/pacman.conf` 中的 EOS Repository 刪除
 
 執行
 ```sh
@@ -557,7 +602,7 @@ pacman -S fcitx5 fcitx5-chinese-addons kcm-fcitx5 fcitx5-qt fcitx5-gtk ttf-saras
 
 **為 NVIDIA GPU 加入 Kernel Parameters**
 
-對於 grub 載入器
+- 對於 grub 載入器
 
 執行
 ```sh
@@ -586,7 +631,7 @@ sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 >此處即使得 `grub` 套用變更並將最終的配置檔案輸出至 `/boot/grub/grub.cfg`
 
-對於 systemd-boot 啟動的 UKI
+- 對於 systemd-boot 啟動的 UKI
 
 ```sh
 nano /etc/cmdline.d/nvidia.conf
@@ -614,11 +659,11 @@ passwd
 
 執行
 ```sh
-useradd -m -s /usr/bin/fish 使用者名稱
+useradd -m -s /usr/bin/fish -G wheel 使用者名稱
 ```
 以建立自己的使用者賬戶
 
-> 此處使用 `useradd` 新增使用者賬戶，`-m` 即於 `/home` 建立該使用者的家目錄，`-s` 為選取登入的Shell，建議使用 `fish`
+> 此處使用 `useradd` 新增使用者賬戶，`-m` 即於 `/home` 建立該使用者的家目錄，`-s` 為選取登入的Shell，建議使用 `fish`，`-G` 即加入某個組
 
 **允許使用者賬戶使用 `sudo`**
 
@@ -647,7 +692,7 @@ root ALL=(ALL:ALL) ALL
 ```sh
 reboot
 ```
-以重新開機，並於開機中選擇 `UEFI OS` 以啟動 Arch Linux
+以重新開機，並於開機中選擇 `UEFI OS (On 磁碟名稱)` 以啟動 Arch Linux
 
 ### 安裝後配置
 
@@ -691,9 +736,11 @@ sudo systemctl enable nvidia-suspend.service
 sudo systemctl enable nvidia-resume.service
 ```
 
+>注意：Gnome 必須啓用該服務
+
 #### 加入 archlinuxcn 倉庫
 
-由於 archlinuxcn 倉庫並不在 `pacman` 所認可的範圍内，我們需要手動添加 archlinuxcn 倉庫及其位址。
+由於 archlinuxcn 倉庫並不在官方所認可的範圍内，我們需要手動添加 archlinuxcn 倉庫及其位址。
 
 執行
 ```sh
@@ -720,6 +767,8 @@ sudo pacman-key --lsign-key "farseerfc@archlinux.org"
 ```
 以在本機添加對 farseerfc 的密鑰的信任
 
+> `pacman` 不會安裝來自不受信任的倉庫或維護者的包，所以需要於本機添加信任
+
 隨即執行
 ```sh
 sudo pacman -Sy archlinuxcn-keyring
@@ -728,7 +777,7 @@ sudo pacman -Sy archlinuxcn-keyring
 
 （可選）安裝 `archlinuxcn-mirrorlist-git` 以獲得一份 archlinuxcn 鏡像列表，以便于 `/etc/pacman.conf` 中直接引入
 
-#### 啓用 AUR 倉庫
+#### 啓用 AUR 倉庫 (Arch User Repository)
 
 `paru` 是一個專注於功能的 AUR 包管理員
 
@@ -748,7 +797,7 @@ sudo pacman -S --needed base-devel git
 以安裝依賴項目
 
 執行
->建議於 `~` 下執行，若您日後需要歸檔自己或他人的 `git`，亦可以於您慾進行歸檔管理的目錄下執行
+>建議於 `~` 下執行，若您日後需要歸檔自己或他人的項目，亦可以於您慾進行歸檔管理的目錄下執行
 ```sh
 git clone https://aur.archlinux.org/paru.git
 cd paru
@@ -761,6 +810,8 @@ cd paru
 makepkg -si
 ```
 
+> `makepkg` 是 Arch Linux 所使用的建立包的軟體，類似於 Gentoo Linux 的 `portage` 和 FreeBSD 的 `ports`
+
 #### 使用 Snapper 對作業系統進行快照備份
 
 **安裝 Snapper 及其附加程式**
@@ -770,7 +821,7 @@ makepkg -si
 sudo pacman -S snapper snap-pac btrfs-assistant
 ```
 
->`snapper` 是由 openSUSE的 Arvin Schnell 開發的程式，用於管理 Btrfs 檔案系統子卷與 LVM Thin-provisioned 卷。通過建立和比較快照在快照間回滾，且支援自動按時間序列建立快照。
+>`snapper` 是由 openSUSE的 Arvin Schnell 開發的程式，用於管理 Btrfs 檔案系統子卷與 LVM Thin-provisioned 卷快照。通過建立和比較快照在快照間回滾，且支援自動按時間序列建立快照。
 
 >`snap-pac` 是一個 `pacman` 的挂鈎，用於在 `pacman` 執行前後觸發 `snapper` 建立快照
 
@@ -778,11 +829,11 @@ sudo pacman -S snapper snap-pac btrfs-assistant
 
 執行 `btrfs-assistant`
 
+> `btrfs-assistant` 是一個帶有圖形界面的 btrfs 管理工具，可以方便地管理 `snapper` 設定檔及 btrfs 子卷
+
 - 於 *Snapper Settings* 欄建立對於 `/` 的設定檔
 - 套用 `systemd` 的服務
 - 變更 *Timeline* 自動快照的設定
-
->顧名思義，`btrfs-assistant` 是一個擁有圖形使用者界面的 Btrfs 檔案系統管理員
 
 設定 `snap-pac` 的 `pacman` 掛鉤
 
@@ -869,4 +920,4 @@ EndSection
 
 套用變更
 
-**本手冊僅供新手參考，欲進行更多自訂設定，請自行探索，當然，別忘了BTRFS備份**
+**本手冊僅供新手參考，欲進行更多自訂設定，請自行探索，當然，別忘了 BTRFS 備份**
