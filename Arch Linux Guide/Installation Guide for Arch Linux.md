@@ -821,7 +821,7 @@ makepkg -si
 sudo pacman -S snapper snap-pac btrfs-assistant
 ```
 
->`snapper` 是由 openSUSE的 Arvin Schnell 開發的程式，用於管理 Btrfs 檔案系統子卷與 LVM Thin-provisioned 卷快照。通過建立和比較快照在快照間回滾，且支援自動按時間序列建立快照。
+>`snapper` 是由 openSUSE 的 Arvin Schnell 開發的程式，用於管理 Btrfs 檔案系統子卷與 LVM Thin-provisioned 卷快照。通過建立和比較快照在快照間回滾，且支援自動按時間序列建立快照。
 
 >`snap-pac` 是一個 `pacman` 的挂鈎，用於在 `pacman` 執行前後觸發 `snapper` 建立快照
 
@@ -895,10 +895,8 @@ sudo systemctl enable apparmor
 
   後方的引號中加入
   ```
-  lsm=landlock,yama,integrity,apparmor,bpf
+  lsm=lockdown,landlock,yama,integrity,apparmor,bpf
   ```
-
-- 不啓用內核 Lockdown 功能是因爲使用了閉源的 NVIDIA GNU/Linux Driver
 
 #### 關於 NVIDIA GPU 上的 Xorg 進程
 
