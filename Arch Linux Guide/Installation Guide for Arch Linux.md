@@ -8,7 +8,7 @@
 
 ## 2. 變更 UEFI BIOS 設定並載入 ISO
 
->此處要强調的是 Arch 的 “Live ISO” 環境，使用 Arch Linux Install Medium ISO 并不是强制條件。因爲在此 ISO 中有條件不一定充分，例如高校學生欲使用要求身份認證的校園網執行安裝作業，此時利用 Endeavour OS 的 Live ISO 或許更好。
+>此處要强調的是 Arch 的 “Live ISO” 環境，使用 Arch Linux Install Medium ISO 并不是强制條件。慾使用 GUI 對安裝作業環境進行一定配置，如連線至校園網，請使用 EndeavourOS Live ISO。
 
 ### ASUS:
 
