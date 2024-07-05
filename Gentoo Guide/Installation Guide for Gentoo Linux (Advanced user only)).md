@@ -1,12 +1,12 @@
 # Installation Guide for Gentoo Linux, ADVANCED USER ONLY
 
-> Gentoo Linux 是基於源碼構建的作業系統，因此其对绝大多数的硬体都有着非常好的相容性，此处以 AMD64 (x86_64) 的安装为例。
+> Gentoo Linux 是基於源碼構建的作業系統，因此其對於絕大多數的硬體都有極好的相容性，此處以 AMD64 (x86_64) 的安装为例。
 
 ## 1. 歸檔並燒錄映像檔
 
 前往 [官方網站](https://www.gentoo.org/downloads/) 選擇鏡像並歸檔
 
-使用 [Etcher](https://etcher.balena.io/) 燒錄映像檔至USB Disk
+使用 [Etcher](https://etcher.balena.io/) 燒錄映像檔至 USB Disk
 
 ## 2. 變更 UEFI BIOS 設定並載入 ISO
 
@@ -26,11 +26,11 @@
 
 > 慾獨立 `/home` `/usr` `/opt` 分割，請按需調整
 
-- `/boot` 用作 EFI system partition 时至少需要 1 GB
+- `/boot` 用作 EFI system 分割時至少需要 1 GB
 
-- `/` 可以按需调整，建议 50 GB
+- `/` 可以按需調整，建議 50 GB
 
-- `swap` 按需建立，但建议安装的 RAM 较大 (64 GB 及以上) 的不建立
+- `swap` 按需建立，但建議安裝的 RAM 较大 (64 GB 及以上) 的計算機不建立
 
 此爲 Gentoo Handbook 中對 `swap` 的建議
 
@@ -43,11 +43,11 @@
 
 #### 建立檔案系統
 
-- 對於 `/boot` 作爲 EFI system partition，請使用 FAT32
+- 對於 `/boot` 作爲 EFI system 分割，請使用 FAT32
 
-- 對於 `/`，建議使用 btrfs，並將 `/var/log` 獨立掛載與一個子卷
+- 對於 `/`，建議使用 btrfs，並將 `/var/log` 獨立掛載於一個子卷
 
-- 對於獨立的分割，建議使用 f2fs （機械硬碟可以使用 XFS）
+- 對於其他獨立的分割，建議使用 f2fs （機械硬碟可以使用 XFS）
 
 ### 連線至 Internet 並校準時間
 
@@ -63,23 +63,27 @@
 
 - 掛載磁碟分割
 
-1. 於 `/mnt` 建立 `/mnt/gentoo` 資料夾
-2. 掛載作爲根目錄的磁碟分割或 btrfs 子卷至 `/mnt/gentoo` 並建立 `/boot` `/home` 以及其他您獨立掛載的掛載點的資料夾
+1. 建立 `/mnt/gentoo` 資料夾
+   
+2. 掛載作爲根目錄的磁碟分割或 btrfs 子卷至 `/mnt/gentoo` 並建立 `boot` `home` 以及其他您獨立掛載的掛載點的資料夾
+   
 3. 掛載所有磁碟分割或子卷
 
 - 安裝 stage3 檔案
 
 1. 切換目錄至 `/mnt/gentoo`
+   
 2. 使用 `links` 或 `wget` 歸檔 stage3 檔案
    
 例如
+
 ```sh
 links https://mirrors.cernet.edu.cn/gentoo/releases/amd64/autobuilds/
 ```
 
 選擇一個資料夾，例如 `current-stage3-amd64-desktop-systemd`
 
-選擇歸檔 `stage3-amd64-desktop-systemd-<date>.tar.xz`
+選擇歸檔 `stage3-amd64-desktop-systemd-<time>.tar.xz`
 
 歸檔完成後，請按需執行檔案校驗
 
@@ -88,7 +92,7 @@ links https://mirrors.cernet.edu.cn/gentoo/releases/amd64/autobuilds/
 於 `/mnt/gentoo` 目錄中執行
 
 ```sh
-tar xpf stage3-amd64-desktop-systemd-<date>.tar.xz --xattrs-include='*.*' --numeric-owner
+tar xpf stage3-amd64-desktop-systemd-<time>.tar.xz --xattrs-include='*.*' --numeric-owner
 ```
 
 以安裝 stage3 檔案
@@ -116,10 +120,10 @@ COMMON_FLAGS="-O2 -pipe"
 變更爲
 
 ```
-COMMON_FLAGS="-march= x86-64 -O2 -pipe"
+COMMON_FLAGS="-march=x86-64 -O2 -pipe"
 ```
 
-> 若您的 CPU 是 x86-64-v3 的微架構，可以考慮使用 `-march= x86-64-v3`；若支援 AVX512，可以考慮使用 `-march= x86-64-v4`
+> 若您的 CPU 是 x86-64-v3 的微架構，可以考慮使用 `-march=x86-64-v3`；若支援 AVX512，可以考慮使用 `-march=x86-64-v4`
 
 > 根據 Gentoo Handbook，`-O2` 是最合適的等級，`-O3` 可以稍微加快速度，但 “某些時候會出現問題”
 
@@ -171,17 +175,17 @@ USE=""
 
 並與引號內加入
 
-例如，本機慾使用 X Server, Wayland, KDE Plasma, KVM, Pipewire，且優先使用預先編譯的二進制包
+例如，本機慾使用 X Server, Wayland, KDE Plasma, KVM, Pipewire，且優先使用預先編譯的二進制包，對於需要編譯安裝的使用 `jumbo-build` 加速編譯
 
 可以寫入
 
 ```
-USE="X wayland kde kvm pipewire pulseaudio bindist dist-kernel -gnome"
+USE="X wayland kde kvm pipewire pulseaudio bindist dist-kernel jumbo-build -gnome"
 ```
 
 6. 設定接受的條款
 
-推薦對全域使用如下設定，並於 `/etc/portage/package.license/` 中對某些包進行例外設定
+推薦對全域使用如下設定，並於 `/etc/portage/package.license/` 資料夾中對某些包進行例外設定
 
 ```
 ACCEPT_LICENSE="-* @FREE @BINARY-REDISTRIBUTABLE"
@@ -236,7 +240,7 @@ sync-uri = https://distfiles.gentoo.org/releases/amd64/binpackages/23.0/x86-64/
 替換爲慾使用的鏡像，例如：
 
 ```
-http://mirrors.sustech.edu.cn/gentoo/releases/amd64/binpackages/23.0/x86-64/
+sync-uri = http://mirrors.sustech.edu.cn/gentoo/releases/amd64/binpackages/23.0/x86-64/
 ```
 
 ### 進入 Gentoo Linux 執行後續安裝及設定
@@ -285,7 +289,7 @@ cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
   export PS1="(chroot) ${PS1}"
   ```
 
-#### 同步化 `portage` 資料庫並設定二進制包認證
+#### 同步化處理 `portage` 資料庫並設定二進制包認證
 
 執行
 
@@ -341,6 +345,8 @@ Gentoo Linux 提供了一個自動化的程式用於加入 CPU 支援的命令�
 emerge --ask --oneshot app-portage/cpuid2cpuflags
 ```
 
+> `--oneshot` 是表示不要將該包錄入 world 集合中，因爲該程式只需要使用一次
+
 以安裝
 
 再執行
@@ -351,7 +357,7 @@ echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
 
 以匯入所有 `CPU_FLAGS`
 
-#### 更新 @world 集合中的所有包
+#### 更新 world 集合中的所有包
 
 > 這一步並非必要，因爲安裝完成且進入作業系統後再更新亦無妨
 
@@ -361,9 +367,11 @@ echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
 emerge --ask --verbose --update --deep --newuse @world
 ```
 
+> 簡便表達，可以使用 `-avuDN`
+
 即可
 
-> 可以考慮加入 `--getbinpkg` 以使用二進制包
+> 可以考慮加入 `--getbinpkg` 以使用二進制包；簡便表達爲 `-g`
 
 #### 設定 locale
 
@@ -390,7 +398,7 @@ eselect locale list
 使用
 
 ```sh
-eselect locale set
+eselect locale set <ID>
 ```
 
 以設定全域 locale
@@ -417,9 +425,9 @@ ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
 
 #### 安裝 Linux 內核及韌體
 
-> 以將 `systemd` 作爲 init 程式並使用 `systemd-boot` 啓動`dracut` 建立的 `gentoo-kernel-bin` 的 Unified Kernel Image 爲例
+> 以將 `systemd` 作爲 init 程式並使用 `systemd-boot` 啓動 `dracut` 建立的 `gentoo-kernel-bin` 的 Unified Kernel Image 爲例
 
-1. 加入 `installkernel` 對 `dracut` `systemd-boot` 以及 UKI 的支援
+1. 加入 `installkernel` 包對 `dracut` `systemd-boot` 以及 UKI 的支援
    
    執行
 
@@ -466,14 +474,21 @@ ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
    ```
    uefi="yes"
    hostonly="yes"
-   kernel_cmdline="所需的執行的命令"
+   kernel_cmdline="所需執行的命令"
    ```
 
+   > 同樣的，`dracut` 也支援分類管理配置檔案，建立 `/etc/dracut.conf.d/` 資料夾並於此加入配置檔案
+
    > 對於一個使用 btrfs 檔案系統和 NVIDIA GPU 的計算機而言， `kernel_cmdline` 通常包括
+   >
    > `root=UUID=<分割的UUID>`
+   >
    > `rootflags=subvol=<根目錄所在子卷>`
+   >
    > `rootfstype=btrfs`
+   >
    > `rw`
+   >
    > `nvidia_drm.modeset=1`
 
 #### 撰寫 `/etc/fstab`
@@ -572,10 +587,10 @@ systemctl preset-all
 執行
 
 ```sh
-emerge -ag1 networkmanager
+emerge -ag networkmanager
 ```
 
-> `-a` 即 `--ask`，要求二次確認；`-g` 即 `-getbinpkg`，優先使用二進制包；`-1` 即 `--oneshot`，安裝時包括所有依賴
+> `-a` 即 `--ask`，要求二次確認；`-g` 即 `-getbinpkg`，優先使用二進制包
 
 再執行
 
@@ -667,7 +682,7 @@ reboot
   執行
 
   ```sh
-  emerge -ag1 xorg-server nvidia-drivers
+  emerge -ag xorg-server nvidia-drivers
   ```
 
 - 安裝 KDE Plasma
@@ -675,7 +690,7 @@ reboot
   執行
 
   ```sh
-  emerge -ag1 plasma-meta sddm kde-apps/dolphin ark konsole
+  emerge -ag plasma-meta sddm kde-apps/dolphin ark konsole
   ```
 
 - 啓用 SDDM 登入
