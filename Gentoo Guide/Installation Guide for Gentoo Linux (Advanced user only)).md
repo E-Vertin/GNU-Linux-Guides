@@ -1,6 +1,6 @@
 # Installation Guide for Gentoo Linux, ADVANCED USER ONLY
 
-> Gentoo Linux 是基於源碼構建的作業系統，因此其對於絕大多數的硬體都有極好的相容性，此處以 AMD64 (x86_64) 的安装为例。
+> Gentoo Linux 是基於源碼構建的作業系統，因此其對於絕大多數的硬體都有極好的相容性，此處以 AMD64 (x86_64) 架構點計算機的安装为例。
 
 ## 1. 歸檔並燒錄映像檔
 
@@ -47,11 +47,23 @@
 
 - 對於 `/`，建議使用 btrfs，並將 `/var/log` 獨立掛載於一個子卷
 
+  慾進一步細分，還可以將 `/var/cache` 與 `/var/tmp` 獨立掛載
+
+  > 若您有足夠的 RAM，可以考慮將 `/var/tmp/portage` 掛載爲 tmpfs
+  >
+  > 於 `/etc/fstab` 中加入
+  >
+  > ```
+  > tmpfs           /var/tmp/portage                tmpfs   size=<大小>G,uid=portage,gid=portage,mode=775    0 0
+  > ```
+
 - 對於其他獨立的分割，建議使用 f2fs （機械硬碟可以使用 XFS）
 
 ### 連線至 Internet 並校準時間
 
 此舉是爲歸檔並解壓 stage3 檔案做準備
+
+(TO BE LINKED to Arch Guide)
 
 ## 開始 Gentoo Linux 的安裝作業
 
@@ -65,7 +77,7 @@
 
 1. 建立 `/mnt/gentoo` 資料夾
    
-2. 掛載作爲根目錄的磁碟分割或 btrfs 子卷至 `/mnt/gentoo` 並建立 `boot` `home` 以及其他您獨立掛載的掛載點的資料夾
+2. 掛載作爲根目錄的磁碟分割或 btrfs 子卷至 `/mnt/gentoo` 並建立 `/mnt/gentoo/boot` `/mnt/gentoo/home` 以及其他您獨立掛載的作爲掛載點的資料夾
    
 3. 掛載所有磁碟分割或子卷
 
@@ -180,12 +192,12 @@ USE=""
 可以寫入
 
 ```
-USE="X wayland kde kvm pipewire pulseaudio bindist dist-kernel jumbo-build -gnome"
+USE="X wayland kde qt kvm pipewire pulseaudio bindist dist-kernel -gnome"
 ```
 
 6. 設定接受的條款
 
-推薦對全域使用如下設定，並於 `/etc/portage/package.license/` 資料夾中對某些包進行例外設定
+推薦對全域使用如下設定，並於 `portage/package.license/` 資料夾中對某些包進行例外設定
 
 ```
 ACCEPT_LICENSE="-* @FREE @BINARY-REDISTRIBUTABLE"
@@ -198,7 +210,7 @@ ACCEPT_LICENSE="-* @FREE @BINARY-REDISTRIBUTABLE"
 執行
 
 ```sh
-mkdir /etc/portage/repos.conf
+mkdir /mnt/gentoo/etc/portage/repos.conf
 ```
 
 此資料夾用於存放 gentoo 官方倉庫以及 `eselect` 中啓用的倉庫的設定檔案
@@ -208,12 +220,12 @@ mkdir /etc/portage/repos.conf
 執行
 
 ```sh
-cp /usr/share/portage/config/repos.conf /etc/portage/repos.conf/gentoo.conf
+cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
 ```
 
 替換倉庫位址爲鏡像位址
 
-使用 `nano` 編輯 `etc/portage/repos.conf/gentoo.conf`
+使用 `nano` 編輯 `/mnt/gentoo/etc/portage/repos.conf/gentoo.conf`
 
 將行
 
@@ -229,7 +241,7 @@ sync-uri = rsync://mirrors.cernet.edu.cn/gentoo-portage
 
 #### 添加 `portage` 二進制包倉庫
 
-使用 `nano` 編輯 `/etc/portage/binrepos.conf/gentoobinhost.conf` 
+使用 `nano` 編輯 `/mnt/gentoo/etc/portage/binrepos.conf/gentoobinhost.conf` 
 
 將行
 
