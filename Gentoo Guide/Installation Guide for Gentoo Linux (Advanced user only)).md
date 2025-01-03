@@ -39,7 +39,7 @@
 | 2 GB or less | 2*RAM | 3*RAM |
 | 2 to 8 GB | RAM amount | 2*RAM |
 | 8 to 64 GB | 8 GB minimum, 16 GB maximum | 1.5*RAM |
-| 64 GB or greater | 8 GB minimum | Hibernation not RECOMMENDED! |
+| 64 GB or greater | 8 GB minimum | Hibernation **not RECOMMENDED**! |
 
 #### 建立檔案系統
 
@@ -107,7 +107,7 @@ links https://mirrors.cernet.edu.cn/gentoo/releases/amd64/autobuilds/
 tar xpf stage3-amd64-desktop-systemd-<time>.tar.xz --xattrs-include='*.*' --numeric-owner
 ```
 
-以安裝 stage3 檔案
+以解壓縮 stage3 檔案至根目錄
 
 ### 調整 `portage` 設定
 
@@ -121,7 +121,7 @@ tar xpf stage3-amd64-desktop-systemd-<time>.tar.xz --xattrs-include='*.*' --nume
 nano /mnt/gentoo/etc/portage/make.conf
 ```
 
-1. 變更所有語言的編譯器設定
+1. 變更編譯器設定
 
 找到行
 
@@ -321,7 +321,7 @@ getuto
 
 #### 選擇本機設定檔
 
-> `eselect` 的設定檔賦予 `USE` `CFLAGS` 以及其他重要變數預設值，並屏蔽了某些包及某些包的版本，因此請謹慎選擇
+> `eselect` 的設定檔賦予 `USE` `CFLAGS` 以及其他重要變數預設值，並屏蔽了某些包及某些包的版本，這是作爲整個作業系統的基石，因此請謹慎選擇
 
 執行
 
@@ -383,7 +383,7 @@ emerge --ask --verbose --update --deep --newuse @world
 
 即可
 
-> 可以考慮加入 `--getbinpkg` 以使用二進制包；簡便表達爲 `-g`
+> 可以考慮加入 `--getbinpkg` 以使用二進制包；簡便表達爲 `-g`，也就是 `emerge -agvuDN @world`
 
 #### 設定 locale
 
@@ -502,6 +502,8 @@ ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
    > `rw`
    >
    > `nvidia_drm.modeset=1`
+   >
+   > 填入時請以逗號分隔
 
 #### 撰寫 `/etc/fstab`
 
@@ -652,7 +654,7 @@ bootctl list
 
 檢查啓動項目
 
-> 注意：若使用了 LVM，則應該爲包 `sys-fs/lvm2` 加入 `lvm` 的 `USE`，並在 `dracut` 中要求加入 `lvm` 模塊
+> 注意：若使用了 LVM，則應該爲包 `sys-fs/lvm2` 加入 `lvm` 的 `USE Flags`，並在 `dracut` 中要求加入 `lvm` 模塊
 
 > 使用 `nano` 編輯 `/etc/dracut.conf`
 >
