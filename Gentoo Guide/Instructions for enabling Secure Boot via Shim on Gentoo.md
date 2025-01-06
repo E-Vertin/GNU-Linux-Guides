@@ -32,7 +32,7 @@ openssl x509 -outform DER -in MOK.crt -out MOK.cer
 
 請將此密鑰妥善儲存至 EFI System Partition 以便 MOK Manager 存取
 
-## 3. 變更 `/etc/portage/make.conf` 設定以全域啓用 Secure Boot 與自動簽名
+## 3. 變更 `/etc/portage/make.conf` 設定以全域啓用 Secure Boot 與模塊自動簽名
 
 執行
 ```sh
@@ -46,6 +46,9 @@ USE="secureboot modules-sign"
 
 SECUREBOOT_SIGN_KEY=<私鑰的絕對位址>
 SECUREBOOT_SIGN_CERT=<簽章的絕對位址>
+
+MODULES_SIGN_KEY=<私鑰的絕對位址>
+MODULES_SIGN_CERT=<簽章的絕對位址>
 ```
 
 保存並退出 `nano`
@@ -58,6 +61,25 @@ emerge -auDN @world
 以套用變更
 
 > 此舉 `portage` 將會自動爲已安裝的所有 Distribution Kernel（例如 `sys-kernel/gentoo-kernel-bin`）, 3rd-Party Modules（例如 `x11-drivers/nvidia-drivers`） 以及 Bootloader 簽名
+
+**請注意，對於自行編譯的內核請加入自行建立的簽章**
+
+- 對於 `.config`
+  
+  請定位至 `CONFIG_SYSTEM_TRUSTED_KEYS`
+
+  變更爲 `CONFIG_SYSTEM_TRUSTED_KEYS=<簽章的絕對位址>`
+
+- 對於 `make menuconfig`
+
+  請定位至
+  ```
+  Cryptographic API  --->
+    Certificates for signature checking  --->
+      () Additional X.509 keys for default system keyring
+  ```
+
+  變更爲 `(<簽章的絕對位址>) Additional X.509 keys for default system keyring`
 
 ## 4. 部署 `shim` 與 `systemd-boot`
 
@@ -122,8 +144,8 @@ uefi="yes"
 
 加入
 ```
-uefi_secureboot_cert="<簽章的絕對位址>"
 uefi_secureboot_key="<私鑰的絕對位址>"
+uefi_secureboot_cert="<簽章的絕對位址>"
 ```
 
 ### 重新建立 UKI
@@ -139,22 +161,10 @@ uefi_secureboot_key="<私鑰的絕對位址>"
   > 若使用的是 `sys-kernel/gentoo-kernel` 則相應替換
 
 - 使用 `dracut` 直接建立
-  
-  執行
-  ```sh
-  eselect kernel list
-  ```
-  以檢視當前 `/usr/src/linux` 這個 Symbolic Link 的指向
-
-  使用
-  ```sh
-  eselect kernel set <序號>
-  ```
-  以重新建立 Symbolic Link 以選中內核
 
   執行
   ```sh
-  dracut
+  dracut --kernel-image=/usr/src/<你的內核>/arch/<你的架構>/boot/bzImage
   ```
   以爲當前所選內核重新建立 UKI
 
