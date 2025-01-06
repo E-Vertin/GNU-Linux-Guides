@@ -46,9 +46,6 @@ USE="secureboot modules-sign"
 
 SECUREBOOT_SIGN_KEY=<私鑰的絕對位址>
 SECUREBOOT_SIGN_CERT=<簽章的絕對位址>
-
-MODULES_SIGN_KEY=<私鑰的絕對位址>
-MODULES_SIGN_CERT=<簽章的絕對位址>
 ```
 
 保存並退出 `nano`
