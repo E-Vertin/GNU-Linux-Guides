@@ -43,7 +43,7 @@ Because it is easier to install and closer to its upstream (Arch Linux), it is t
 
 ## Join us
 
-We're not Linux experts, so please forgive us for reviewing guides that are outdated or not considered to be the best way to solve a problem. If you're interested in contributing, feel free to submit a **Pull request** or write an **Issue** report!
+We're not Linux experts, so please forgive us for content that is outdated or not considered to be the best way to solve a problem. If you're interested in contributing, feel free to submit a **Pull request** or write an **Issue** report!
 
 ## In the future...
 
