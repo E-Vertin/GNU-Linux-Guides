@@ -197,7 +197,7 @@ uefi_secureboot_cert="<簽章的絕對位址>"
   
   執行
   ```sh
-  dmesg | grep Secure
+  dmesg | grep -i secure
   ```
   > 我的輸出是這樣的
   > ```

@@ -446,7 +446,7 @@ nano /mnt/etc/fstab
 
 把掛載點為 `/var/log` 和 `/var/cache/pacman/pkg` 的分割區的掛載選項中的 `compress=zstd` 改為 `nodatacow`
 
-**使用 fstrim.timer 進行排程TRIM**
+**使用 fstrim.timer 進行排程 TRIM**
 
 對於 btrfs，請刪除 `/mnt/etc/fstab` 挂載選項中的 `discard` 項目
 
