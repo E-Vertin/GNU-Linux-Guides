@@ -6,7 +6,7 @@
 
 This project is a collection of installation guides, tips, and tricks for some GNU/Linux distributions. It is intended for users who are new to GNU/Linux. 
 
-The guides are written by contributors, and are mainly based on our experience tinkering around with these distributions. We aim to provide clear and concise instructions that are easy to follow. If you have any questions or suggestions, feel free to open an **issue** or submit a **pull request**.
+The guides are written by contributors, and are mainly based on our experience of tinkering around with these distributions. We aim to provide clear and concise instructions that are easy to follow. If you have any questions or suggestions, feel free to open an **Issue** or submit a **Pull request**.
 
 ## Table of Contents
 
@@ -14,6 +14,7 @@ The guides are written by contributors, and are mainly based on our experience t
 | --- | --- | --- |
 | [Endeavour OS](#endeavour-os) | [EndeavourOS](https://endeavouros.com/) is an Arch-based distro that provides an Arch experience without the hassle of installing it manually for both x86_64 and ARM systems. | [Installation Guide](EOS%20Guide/Installation%20Guide%20for%20Endeavour%20OS%2C%20A%20Distro%20Based%20On%20archlinux.md), [Advanced Guide](EOS%20Guide/Advanced%20Guide%20for%20Endeavour%20OS.md) |
 | [Arch Linux](#arch-linux) | [Arch Linux](https://www.archlinux.org/) is a lightweight and flexible Linux distribution that tries to "Keep It Simple". It is based on a rolling-release system, which allows you to install once and get future updates without reinstalling the whole OS. Arch is an excellent distribution that suits users who have certain understanding and experience in using GNU/Linux well, especially for those who want a minimal system setup with the latest software. | [Installation Guide](Arch%20Linux%20Guide/Installation%20Guide%20for%20Arch%20Linux.md) |
+| [Gentoo Linux](#gentoo-linux) | [Gentoo Linux](https://www.gentoo.org/) is a source-based distribution with an extremely flexible package manager that can be adapted to almost any usage scenario. However, it has a high learning cost so is only suitable for more professional users. | [Installation Guide](Gentoo%20Guide/Installation%20Guide%20for%20Gentoo%20Linux%20(Advanced%20user%20only).md) |
 
 ### Endeavour OS
 
@@ -32,10 +33,18 @@ Because it is easier to install and closer to its upstream (Arch Linux), it is t
 
 - [Installation Guide](Arch%20Linux%20Guide/Installation%20Guide%20for%20Arch%20Linux.md)
 
+### Gentoo Linux
+
+> ![Gentoo Linux Logo](https://assets.gentoo.org/tyrian/v1/site-logo.svg)
+>
+> [Gentoo Linux](https://www.gentoo.org/) is a GNU/Linux "meta-distribution" for professional users, with a package manager, `portage`, for fine-grained package management and customisation.
+
+- [Installation Guide](Gentoo%20Guide/Installation%20Guide%20for%20Gentoo%20Linux%20(Advanced%20user%20only).md) 
+
 ## Join us
 
-We are not Linux experts, and it is inevitable that there will be outdated or unreasonable operations. Please forgive me. If you are interested in joining the writing, please welcome **Pull Requests** or write **Issues**!
+We're not Linux experts, so please forgive us for reviewing guides that are outdated or not considered to be the best way to solve a problem. If you're interested in contributing, feel free to submit a **Pull request** or write an **Issue** report!
 
 ## In the future...
 
-Currently we're compiling Arch Guides, it is possible that Gentoo Guides is our next.
+At this stage we are still working on the Arch Linux and Gentoo Linux guides and are expanding from installation guides.
