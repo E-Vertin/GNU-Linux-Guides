@@ -40,7 +40,7 @@ Because it is easier to install and closer to its upstream (Arch Linux), it is t
 > [Gentoo Linux](https://www.gentoo.org/) is a GNU/Linux "meta-distribution" for professional users, with a package manager, `portage`, for fine-grained package management and customisation.
 
 - [Installation Guide](Gentoo%20Guide/Installation%20Guide%20for%20Gentoo%20Linux%20(Advanced%20user%20only).md) 
-- [Secure Boot Guide](Gento%20Guide/Instructions%20for%20enabling%20Secure%20Boot%20via%20Shim%20on%20Gentoo.md)
+- [Secure Boot Guide](Gentoo%20Guide/Instructions%20for%20enabling%20Secure%20Boot%20via%20Shim%20on%20Gentoo.md)
 
 ## Join us
 

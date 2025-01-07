@@ -42,7 +42,7 @@
 > [Gentoo Linux](https://www.gentoo.org/) 是一個適合專業使用者的 GNU/Linux “元發行版”，其包管理員 `portage` 能夠進行精細化的包管理與定製。
 
 - [安裝指南](Gentoo%20Guide/Installation%20Guide%20for%20Gentoo%20Linux%20(Advanced%20user%20only).md) 
-- [啓用安全啓動的指南](Gento%20Guide/Instructions%20for%20enabling%20Secure%20Boot%20via%20Shim%20on%20Gentoo.md)
+- [啓用安全啓動的指南](Gentoo%20Guide/Instructions%20for%20enabling%20Secure%20Boot%20via%20Shim%20on%20Gentoo.md)
 
 ## 加入我們
 
