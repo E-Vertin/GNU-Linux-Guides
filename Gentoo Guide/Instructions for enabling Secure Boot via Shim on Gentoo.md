@@ -213,6 +213,10 @@ uefi_secureboot_cert="<簽章的絕對位址>"
   有表格類型輸出則成功載入
 
 
-**本文中實現的 Secure Boot 的安全性依完全賴於您的 UEFI BIOS Passcode 的強度**
+**本文中實現的 Secure Boot 的安全性依完全賴於您的 UEFI BIOS Passcode 與 MOK Manager Passcode 的強度**
+
+- **弱 UEFI BIOS Passcode 可能會被他人直接關閉 Secure Boot 以及一系列的安全設定**
+
+- **弱 MOK Manager Passcode 可能使得他人有可乘之機將其簽章錄入**
 
 **啓用 Secure Boot 其實並不會爲您的電腦的安全性帶來實質性的提升，僅僅只是爲了不影響 Windows 的功能**
