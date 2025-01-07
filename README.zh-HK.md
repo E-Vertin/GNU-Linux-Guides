@@ -25,7 +25,7 @@
 因其更易於安裝且更貼近其上游（Arch Linux），所以對於將來欲使用 Arch Linux 的使用者而言是接觸、熟悉 Arch Linux 的不二之選。
 
 - [安裝指南](EOS%20Guide/Installation%20Guide%20for%20Endeavour%20OS%2C%20A%20Distro%20Based%20On%20archlinux.md)
-- [進階指南](EOS%20Guide/Advanced%20Guide%20for%20Endeavour%20OS.md)
+- [貼士](EOS%20Guide/Advanced%20Guide%20for%20Endeavour%20OS.md)
 
 ### Arch Linux
 
