@@ -1,6 +1,6 @@
 # Installation Guide for Gentoo Linux, ADVANCED USER ONLY
 
-> Gentoo Linux 是基於源碼構建的作業系統，因此其對於絕大多數的硬體都有極好的相容性，此處以 AMD64 (x86_64) 架構點計算機的安装为例。
+> Gentoo Linux 是基於源碼構建的作業系統，因此其對於絕大多數的硬體都有極好的相容性，此處以 amd64 (x86_64) 架構的計算機的安装为例。
 
 ## 1. 歸檔並燒錄映像檔
 
