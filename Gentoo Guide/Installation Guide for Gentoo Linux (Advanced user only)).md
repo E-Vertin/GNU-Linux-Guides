@@ -518,6 +518,10 @@ ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
   ```
 
   隨後使用 `nano` 按需求變更掛載設定
+Section "Device"
+   Identifier  "nvidia"
+   Driver      "nvidia"
+EndSection
 
   (TO BE LINKED to Arch Manually Install)
 
@@ -698,6 +702,18 @@ reboot
   ```sh
   emerge -ag xorg-server nvidia-drivers
   ```
+
+  > 請注意，若您使用的是 NVIDIA GPU 作爲唯一視訊輸出 GPU，請加入該配置檔案
+  >
+  > `/etc/X11/xorg.conf.d/nvidia.conf`
+  >
+  > ```
+  > Section "Device"
+  >    Identifier  "nvidia"
+  >    Driver      "nvidia"
+  > EndSection
+  > ```
+
 
 - 安裝 KDE Plasma
   
