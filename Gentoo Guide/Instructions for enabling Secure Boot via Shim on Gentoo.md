@@ -27,7 +27,7 @@ openssl req -newkey rsa:2048 -nodes -keyout priv-key.key -new -x509 -sha256 -day
 
 執行
 ```sh
-openssl x509 -outform DER -in MOK.crt -out MOK.cer
+openssl x509 -outform DER -in cert.crt -out MOK.cer
 ```
 
 請將此密鑰妥善儲存至 EFI System Partition 以便 MOK Manager 存取
@@ -74,9 +74,9 @@ emerge -auDN @world
 
   請定位至
   ```
-  Cryptographic API  --->
-    Certificates for signature checking  --->
-      () Additional X.509 keys for default system keyring
+   Cryptographic API
+    --->  Certificates for signature checking
+      --->  () Additional X.509 keys for default system keyring
   ```
 
   變更爲 `(<簽章的絕對位址>) Additional X.509 keys for default system keyring`
