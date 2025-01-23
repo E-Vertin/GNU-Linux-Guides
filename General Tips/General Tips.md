@@ -63,7 +63,7 @@ sudo systemctl enable --now fstrim.timer
 於 `/etc/crontab` 中寫入
 ```
 # Run file system trim once a week
-15      13      *       *       1       root    /sbin/fstrim --all
+@weekly root  /sbin/fstrim --all
 ```
 
 按下 `Control` 和 `X`，輸入 `Y` 以寫入，再按下 `Enter` 以先前指定的檔案名保存。
