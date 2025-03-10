@@ -120,12 +120,12 @@ efibootmgr --disk /dev/<你的 ESP 分割區所在磁碟> --part <第幾個分�
 >
 > 我的輸出是這樣的
 > ```
-> nvme1n1     259:7    0   1.9T  0 disk 
+> nvme1n1       259:7    0   1.9T  0 disk 
 >   ├─nvme1n1p1 259:8    0    16M  0 part 
 >   ├─nvme1n1p2 259:9    0 953.9G  0 part 
 >   ├─nvme1n1p3 259:10   0     1G  0 part /boot
 >   ├─nvme1n1p4 259:11   0   100G  0 part /
->   ├─nvme1n1p5 259:12   0    80G  0 part /home
+>   └─nvme1n1p5 259:12   0    80G  0 part /home
 > ```
 > 則應該執行
 > ```sh
