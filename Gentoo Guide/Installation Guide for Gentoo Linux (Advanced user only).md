@@ -518,10 +518,6 @@ ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
   ```
 
   隨後使用 `nano` 按需求變更掛載設定
-Section "Device"
-   Identifier  "nvidia"
-   Driver      "nvidia"
-EndSection
 
   (TO BE LINKED to Arch Manually Install)
 
