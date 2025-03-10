@@ -503,7 +503,7 @@ ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
    >
    > `nvidia_drm.modeset=1`
    >
-   > 填入時請以逗號分隔
+   > 填入時請以空格分隔
 
 #### 撰寫 `/etc/fstab`
 
@@ -616,15 +616,19 @@ systemctl enable NetworkManager
 
 #### 安裝作業系統工具
 
-1. 檔案索引
+1. 效能優化
+   
+   安裝 `io-scheduler-udev-rules`
+
+2. 檔案索引
    
    安裝 `mlocate`
 
-2. `bash` 補全
+3. `bash` 補全
 
    安裝 `bash-completion`
 
-3. 檔案系統工具
+4. 檔案系統工具
 
    根據所使用的檔案系統安裝
 
@@ -632,7 +636,7 @@ systemctl enable NetworkManager
 
    > 則應安裝 `btrfs-progs` `f2fs-tools` `dosfstools` `lvm2`
 
-4. WLAN 工具
+5. WLAN 工具
    
    安裝 `iw` `wpa_supplicant`
 

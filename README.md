@@ -12,7 +12,7 @@ The guides are written by contributors, and are mainly based on our experience o
 
 | Distribution | Introduction | Guides |
 | --- | --- | --- |
-| [Endeavour OS](#endeavour-os) | [EndeavourOS](https://endeavouros.com/) is an Arch-based distro that provides an Arch experience without the hassle of installing it manually for both x86_64 and ARM systems. | [Installation Guide](EOS%20Guide/Installation%20Guide%20for%20Endeavour%20OS%2C%20A%20Distro%20Based%20On%20archlinux.md), [Tips](EOS%20Guide/Advanced%20Guide%20for%20Endeavour%20OS.md) |
+| [Endeavour OS](#endeavour-os) | [EndeavourOS](https://endeavouros.com/) is an Arch-based distro that provides an Arch experience without the hassle of installing it manually for both x86_64 and ARM systems. | [Installation Guide](EOS%20Guide/Installation%20Guide%20for%20Endeavour%20OS%2C%20A%20Distro%20Based%20On%20archlinux.md) |
 | [Arch Linux](#arch-linux) | [Arch Linux](https://www.archlinux.org/) is a lightweight and flexible Linux distribution that tries to "Keep It Simple". It is based on a rolling-release system, which allows you to install once and get future updates without reinstalling the whole OS. Arch is an excellent distribution that suits users who have certain understanding and experience in using GNU/Linux well, especially for those who want a minimal system setup with the latest software. | [Installation Guide](Arch%20Linux%20Guide/Installation%20Guide%20for%20Arch%20Linux.md) |
 | [Gentoo Linux](#gentoo-linux) | [Gentoo Linux](https://www.gentoo.org/) is a source-based distribution with an extremely flexible package manager that can be adapted to almost any usage scenario. However, it has a high learning cost so is only suitable for more professional users. | [Installation Guide](Gentoo%20Guide/Installation%20Guide%20for%20Gentoo%20Linux%20(Advanced%20user%20only).md), [Secure Boot Guide](Gentoo%20Guide/Instructions%20for%20enabling%20Secure%20Boot%20via%20Shim%20on%20Gentoo.md) |
 
@@ -24,7 +24,6 @@ The guides are written by contributors, and are mainly based on our experience o
 Because it is easier to install and closer to its upstream (Arch Linux), it is the top choice for users who want to get familiar with Arch Linux in the future.
 
 - [Installation Guide](EOS%20Guide/Installation%20Guide%20for%20Endeavour%20OS%2C%20A%20Distro%20Based%20On%20archlinux.md)
-- [Tips](EOS%20Guide/Advanced%20Guide%20for%20Endeavour%20OS.md)
 
 ### Arch Linux
 
