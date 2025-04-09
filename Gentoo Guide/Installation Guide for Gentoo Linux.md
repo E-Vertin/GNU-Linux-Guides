@@ -701,6 +701,13 @@ rc-update add NetworkManager default
   `sys-process/cronie`
   `net-misc/chrony`
 
+  並分別啓用服務
+
+  ```sh
+  rc-update add sysklogd default
+  rc-update add cronie default 
+  rc-update add chronyd default
+
 #### 安裝啓動載入器
 
 > 以使用 `systemd-boot` 爲例
@@ -804,7 +811,19 @@ reboot
   DISPLAYMANAGER="sddm"
   ```
 
+  啓用 `display-manager` 服務
+
+  ```sh
+  rc-update add display-manager default
+  ```
+
 - 啓用 Pipewire 音訊
+
+  將使用者加入 `pipewire` 組
+
+  ```sh
+  usermod -aG pipewire <使用者名稱>
+  ```
 
   - 對於 `systemd`
 
@@ -817,17 +836,19 @@ reboot
   ```
 
   - 對於 `OpenRC`
+  
+  > 請檢查 `/bin/gentoo-pipewire-launcher` 是否已存在
 
-  對於 KDE Plasma 不需要額外操作
+  對於支援自動啓動的桌面環境，如 KDE Plasma，不需要額外操作
 
   其他桌面環境請參閱 https://wiki.gentoo.org/wiki/PipeWire#OpenRC
 
-- 允許使用者使用音訊裝置以及圖形硬體加速
+- 允許使用者使用可移動裝置以及圖形硬體加速
 
   執行
 
   ```sh
-  usermod -aG audio <使用者名稱>
+  usermod -aG plugdev <使用者名稱>
   usermod -aG video <使用者名稱>
   ```
 
