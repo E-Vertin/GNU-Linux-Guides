@@ -62,9 +62,7 @@ Gentoo 倉庫提供的 Libre Office 二進制包有如下 `USE Flags`：
   
 通常情況下，Profile 與 `/etc/portage/make.conf` 已全域啓用 `gnome` 或 `kde`
 
-> `app-office/libreoffice-l10n::gentoo`
-
-Gentoo 倉庫提供的多語言包的 `USE Flags` 爲 Libre Office 所有支援的語言，並以 `USE_EXPAND Flags` 呈現：
+Gentoo 倉庫提供的 `USE Flags` 爲 Libre Office 所有支援的語言，並以 `USE_EXPAND Flags` 呈現：
 
 > “L10N” 爲英文 “Localisation” 的“簡寫”，同理 “I18N” 爲英文 “Internationalisation” 的“簡寫”
 
@@ -81,7 +79,7 @@ L10N="en-US zh-CN"
 在 `/etc/portage/libreoffice` 中寫入
 
 ```
-app-office/libreoffice-l10n l10n_en-US l10n_zh-CN
+app-office/libreoffice-bin l10n_en-US l10n_zh-CN
 ```
 
 ## QEMU
