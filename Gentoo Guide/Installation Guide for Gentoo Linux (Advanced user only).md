@@ -1,16 +1,14 @@
-# Installation Guide for Gentoo Linux, ADVANCED USER ONLY
+# Installation Guide for Gentoo Linux
 
 > Gentoo Linux 是基於源碼構建的作業系統，因此其對於絕大多數的硬體都有極好的相容性，此處以 amd64 (x86_64) 架構的計算機的安装为例。
 
 ## 1. 歸檔並燒錄映像檔
 
-前往 [官方網站](https://www.gentoo.org/downloads/) 選擇鏡像並歸檔
+前往 [官方網站](https://www.gentoo.org/downloads/) 選擇鏡像並歸檔映像檔
 
 使用 [Etcher](https://etcher.balena.io/) 燒錄映像檔至 USB Disk
 
 ## 2. 變更 UEFI BIOS 設定並載入 ISO
-
-(TO BE LINKED to Basic)
 
 > 此處要强調的是 “Live ISO” 環境，使用 Gentoo Linux Live ISO 并不是强制條件。慾使用 GUI 對安裝作業環境進行一定配置，如連線至校園網，請使用 EndeavourOS Live ISO 或任意一個您熟悉的 ISO。
 
@@ -26,9 +24,9 @@
 
 > 慾獨立 `/home` `/usr` `/opt` 分割，請按需調整
 
-- `/boot` 用作 EFI system 分割時至少需要 1 GB
+- `/boot` 用作 EFI System Partition 分割時至少需要 1 GB
 
-- `/` 可以按需調整，建議 50 GB
+- `/` 可以按需調整，建議 40 GB 及以上
 
 - `swap` 按需建立，但建議安裝的 RAM 较大 (64 GB 及以上) 的計算機不建立
 
@@ -43,13 +41,13 @@
 
 #### 建立檔案系統
 
-- 對於 `/boot` 作爲 EFI system 分割，請使用 FAT32
+- 對於 `/boot` 作爲 EFI System Partion 分割，請使用 FAT32
 
 - 對於 `/`，建議使用 btrfs，並將 `/var/log` 獨立掛載於一個子卷
 
-  慾進一步細分，還可以將 `/var/cache` 與 `/var/tmp` 獨立掛載
+  慾進一步細分，還可以將 `/var/cache` 與 `/var/tmp` 獨立掛載爲子卷
 
-  > 若您有足夠的 RAM，可以考慮將 `/var/tmp/portage` 掛載爲 tmpfs
+  > 若您有足夠的 RAM，可以考慮將 `/var/tmp/portage` 掛載爲 tmpfs 以減少編譯過程中的磁碟讀寫
   >
   > 於 `/etc/fstab` 中加入
   >
@@ -63,7 +61,36 @@
 
 此舉是爲歸檔並解壓 stage3 檔案做準備
 
-(TO BE LINKED to Arch Guide)
+#### 對於 `systemd`
+
+執行
+```sh
+timedatectl 
+```
+以檢查作業系統時間狀態。
+
+執行
+```sh
+timedatectl list-timezone
+```
+以列出時區，同樣的，使用 pipe 和 `grep` 以篩選輸出結果。
+
+欲選取作業系統時區，請執行
+```sh
+timedatectl set-timezone <時區>
+```
+例如
+```sh
+timedatectl set-timezone Asia/Hong_Kong
+```
+
+#### 對於 `OpenRC`
+
+執行
+```sh
+ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
+```
+以設定時區
 
 ## 開始 Gentoo Linux 的安裝作業
 
@@ -93,18 +120,20 @@
 links https://mirrors.cernet.edu.cn/gentoo/releases/amd64/autobuilds/
 ```
 
-選擇一個資料夾，例如 `current-stage3-amd64-desktop-systemd`
+選擇一個資料夾
 
-選擇歸檔 `stage3-amd64-desktop-systemd-<time>.tar.xz`
+對於 `systemd` 請使用 `current-stage3-amd64-desktop-systemd` 中的檔案
+
+對於 `OpenRC` 請使用 `current-stage3-amd64-desktop-openrc` 中的檔案
 
 歸檔完成後，請按需執行檔案校驗
 
-3. 解壓 stage3 檔案
+1. 解壓 stage3 檔案
 
 於 `/mnt/gentoo` 目錄中執行
 
 ```sh
-tar xpf stage3-amd64-desktop-systemd-<time>.tar.xz --xattrs-include='*.*' --numeric-owner
+tar xpf stage3-amd64-desktop-<init>-<time>.tar.xz --xattrs-include='*.*' --numeric-owner
 ```
 
 以解壓縮 stage3 檔案至根目錄
@@ -149,7 +178,7 @@ COMMON_FLAGS="-march=x86-64 -O2 -pipe"
 MAKEOPTS="-j12 -l12"
 ```
 
-兩個數值均爲 CPU 的執行緒數量，或 RAM 的一半，在兩者中取最小的值。
+兩個數值均爲 CPU 的執行緒數量或 RAM 的一半並於兩者中取最小值。
 
 3. 加入 Gentoo 倉庫鏡像
 
@@ -187,7 +216,7 @@ USE=""
 
 並與引號內加入
 
-例如，本機慾使用 X Server, Wayland, KDE Plasma, KVM, Pipewire，且優先使用預先編譯的二進制包，對於需要編譯安裝的使用 `jumbo-build` 加速編譯
+例如，本機慾使用 X Server, Wayland, KDE Plasma, KVM, Pipewire Sound Server，且優先使用預先編譯的二進制包，對於需要編譯安裝的使用 `jumbo-build` 加速編譯
 
 可以寫入
 
@@ -269,7 +298,7 @@ cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 
 2. 掛載必要的檔案系統並進入 Gentoo Linux
 
-- 若您使用的是 Arch Linux 及其衍生版的 Live ISO 且有 `arch-chroot` 程式，這一步非常簡單
+- 若您使用的是 Arch Linux 及其衍生版的 Live ISO 或有 `arch-chroot` 程式，這一步非常簡單
 
   執行
 
@@ -339,6 +368,8 @@ eselect profile list | grep plasma
 
 以篩選使用 KDE Plasma 桌面的設定檔
 
+> 注意：此處的設定檔必須與 stage3 檔案的一致，例如 `systemd` 與 `OpenRC` 的選擇
+
 慾選擇設定檔
 
 執行
@@ -357,7 +388,9 @@ Gentoo Linux 提供了一個自動化的程式用於加入 CPU 支援的命令�
 emerge --ask --oneshot app-portage/cpuid2cpuflags
 ```
 
-> `--oneshot` 是表示不要將該包錄入 world 集合中，因爲該程式只需要使用一次
+> 簡便表達，使用 `-a1`
+
+> `--oneshot` 是表示不要將該包錄入 @world 集合中，因爲該程式只需要使用一次
 
 以安裝
 
@@ -369,7 +402,7 @@ echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
 
 以匯入所有 `CPU_FLAGS`
 
-#### 更新 world 集合中的所有包
+#### 更新 @world 集合中的所有包
 
 > 這一步並非必要，因爲安裝完成且進入作業系統後再更新亦無妨
 
@@ -430,14 +463,12 @@ env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 執行
 
 ```sh
-ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
+ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
 ```
-
-以將 HKT (UTC+8) 設定爲本地時間
 
 #### 安裝 Linux 內核及韌體
 
-> 以將 `systemd` 作爲 init 程式並使用 `systemd-boot` 啓動 `dracut` 建立的 `gentoo-kernel-bin` 的 Unified Kernel Image 爲例
+- 以將 `systemd` 作爲 init 程式並使用 `systemd-boot` 啓動 `dracut` 建立的 `gentoo-kernel-bin` 的 Unified Kernel Image 爲例
 
 1. 加入 `installkernel` 包對 `dracut` `systemd-boot` 以及 UKI 的支援
    
@@ -501,9 +532,24 @@ ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
    >
    > `rw`
    >
-   > `nvidia_drm.modeset=1`
-   >
    > 填入時請以空格分隔
+
+- 以將 `OpenRC` 作爲 init 程式並使用 `systemd-boot` 啓動 `dracut` 建立的 `gentoo-kernel-bin` 的 Unified Kernel Image 爲例
+
+  > 上述的第二步需要注意
+
+  2. 加入 `sys-apps/systemd-utils` 的 `systemd-boot`, `udev` 以及 `kernel-install` 支援
+    
+    執行
+    ```sh
+    nano /etc/portage/package.use/systemd-utils
+    ```
+
+    寫入
+
+    ```
+    sys-apps/systemd-utils boot kernel-install udev
+    ```
 
 #### 撰寫 `/etc/fstab`
 
@@ -517,9 +563,7 @@ ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
   genfstab -U /mnt/gentoo > /mnt/gentoo/etc/fstab
   ```
 
-  隨後使用 `nano` 按需求變更掛載設定
-
-  (TO BE LINKED to Arch Manually Install)
+  隨後回到 chroot 環境使用 `nano` 按需求修改 `/etc/fstab` 變更掛載設定
 
 - 若使用的 Live ISO 沒有 `genfstab`
 
@@ -574,9 +618,9 @@ emerge -a sudo
 
 使用 `nano` 編輯 `/etc/sudoers`
 
-(TO BE LINKED to Arch Manually Install)
+#### 設定 init 程式
 
-#### 設定 `systemd`
+- 對於 `systemd`
 
 執行
 
@@ -594,6 +638,12 @@ systemctl preset-all
 
 以載入所有服務的預設設定
 
+- 對於 `OpenRC`
+
+請分別閱讀並按需修改 `/etc/rc.conf` `/etc/conf.d/keymaps` `/etc/conf.d/hwclock`
+
+> 建議於 `/etc/rc.conf` 中啓用 `rc_logger="YES"`
+
 #### 設定 Internet
 
 > 以使用 `networkmanager` 爲例
@@ -606,13 +656,19 @@ emerge -ag networkmanager
 
 > `-a` 即 `--ask`，要求二次確認；`-g` 即 `-getbinpkg`，優先使用二進制包
 
-再執行
+再啓用服務以開機載入
+
+- 對於 `systemd`
 
 ```sh
 systemctl enable NetworkManager
 ```
 
-以啓用服務
+- 對於 `OpenRC`
+
+```sh
+rc-update add NetworkManager default
+```
 
 #### 安裝作業系統工具
 
@@ -639,6 +695,11 @@ systemctl enable NetworkManager
 5. WLAN 工具
    
    安裝 `iw` `wpa_supplicant`
+
+- 對於 `OpenRC` init，還需要安裝如下工具
+  `app-admin/sysklogd`
+  `sys-process/cronie`
+  `net-misc/chrony`
 
 #### 安裝啓動載入器
 
@@ -678,7 +739,7 @@ bootctl list
 
 #### 重新開機進入 Gentoo Linux
 
-於 `chroot` 環境中執行 `exit`
+於 chroot 環境中執行 `exit`
 
 執行
 
@@ -707,12 +768,12 @@ reboot
   >
   > `/etc/X11/xorg.conf.d/nvidia.conf`
   >
-  > ```
-  > Section "Device"
-  >    Identifier  "nvidia"
-  >    Driver      "nvidia"
-  > EndSection
-  > ```
+  >  ```
+  >  Section "Device"
+  >     Identifier  "nvidia"
+  >     Driver      "nvidia"
+  >  EndSection
+  >  ```
 
 
 - 安裝 KDE Plasma
@@ -725,13 +786,27 @@ reboot
 
 - 啓用 SDDM 登入
 
+  - 對於 `systemd`
+
   執行
 
   ```sh
   systemctl enable sddm
   ```
 
+  - 對於 `OpenRC`
+  
+  修改 `/etc/conf.d/display-manager` 並指定 SDDM
+
+  ```
+  ......
+
+  DISPLAYMANAGER="sddm"
+  ```
+
 - 啓用 Pipewire 音訊
+
+  - 對於 `systemd`
 
   使用者權限執行
 
@@ -740,6 +815,12 @@ reboot
   systemctl --user enable pipewire-pulse
   systemctl --user enable wireplumber
   ```
+
+  - 對於 `OpenRC`
+
+  對於 KDE Plasma 不需要額外操作
+
+  其他桌面環境請參閱 https://wiki.gentoo.org/wiki/PipeWire#OpenRC
 
 - 允許使用者使用音訊裝置以及圖形硬體加速
 
