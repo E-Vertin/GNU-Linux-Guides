@@ -79,7 +79,7 @@ L10N="en-US zh-CN"
 在 `/etc/portage/libreoffice` 中寫入
 
 ```
-app-office/libreoffice-bin l10n_en-US l10n_zh-CN
+app-office/libreoffice-bin L10N: en-US zh-CN
 ```
 
 ## QEMU
