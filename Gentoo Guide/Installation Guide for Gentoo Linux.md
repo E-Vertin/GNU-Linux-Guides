@@ -811,10 +811,11 @@ reboot
   DISPLAYMANAGER="sddm"
   ```
 
-  啓用 `display-manager` 服務
+  啓用 `display-manager` `elogind` 服務
 
   ```sh
   rc-update add display-manager default
+  rc-update add elogind boot
   ```
 
 - 啓用 Pipewire 音訊
