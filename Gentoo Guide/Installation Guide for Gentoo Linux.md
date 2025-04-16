@@ -162,6 +162,8 @@ links https://mirrors.cernet.edu.cn/gentoo/releases/amd64/autobuilds/
 
 #### 變更 `make.conf` 設定
 
+> 詳情請參閲 https://wiki.gentoo.org/wiki//etc/portage/make.conf
+
 執行
 
 ```sh
@@ -244,7 +246,7 @@ USE=""
 USE="X wayland kde qt kvm pipewire pulseaudio bindist dist-kernel -gnome"
 ```
 
-6. 設定接受的條款
+6. 設定所接受的“許可證”
 
 推薦對全域使用如下設定，並於 `portage/package.license/` 資料夾中對某些包進行例外設定
 
@@ -262,9 +264,9 @@ ACCEPT_LICENSE="-* @FREE @BINARY-REDISTRIBUTABLE"
 mkdir /mnt/gentoo/etc/portage/repos.conf
 ```
 
-此資料夾用於存放 gentoo 官方倉庫以及 `eselect` 中啓用的倉庫的設定檔案
+此資料夾用於存放 gentoo 倉庫以及 `eselect` 中啓用的倉庫的設定檔案
 
-2. 拷貝 gentoo 官方倉庫的設定檔案
+1. 拷貝 Gentoo Linux 官方倉庫 (gentoo) 的設定檔案
 
 執行
 
@@ -310,13 +312,15 @@ sync-uri = http://mirrors.sustech.edu.cn/gentoo/releases/amd64/binpackages/23.0/
 
 1. 拷貝 DNS 解析檔案
 
+> 這一步至關重要，否則有可能無妨存取 Internet
+
 執行
 
 ```sh
 cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 ```
 
-2. 掛載必要的檔案系統並進入 Gentoo Linux
+1. 掛載必要的檔案系統並進入 Gentoo Linux
 
 - 若您使用的是 Arch Linux 及其衍生版的 Live ISO 或有 `arch-chroot` 程式，這一步非常簡單
 
@@ -324,6 +328,12 @@ cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 
   ```sh
   arch-chroot /mnt/gentoo
+  ```
+
+  隨後可以變更 Prompt 加以區分 chroot 環境
+
+  ```sh
+  export PS1="(chroot) ${PS1}"
   ```
 
 - 若您沒有該程式，請執行
@@ -338,7 +348,7 @@ cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
   mount --make-slave /mnt/gentoo/run 
   ```
 
-  > 這一步非常重要，`/proc` `/sys` `/dev` `/run` 都是安裝作業系統必要的
+  > 這一步非常重要，`/proc` `/sys` `/dev` `/run` 都是安裝作業系統必要的“偽檔案系統”
 
   隨後，使用 `chroot` 進入 Gentoo Linux
 
@@ -422,9 +432,9 @@ echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
 
 以匯入所有 `CPU_FLAGS`
 
-#### 更新 @world 集合中的所有包
+#### 更新 @world 集合中的所有包（可選步驟）
 
-> 這一步並非必要，因爲安裝完成且進入作業系統後再更新亦無妨
+> 這一步並非必要，因爲安裝完成且進入作業系統後再更新亦無妨，若後續出現編譯或安裝問題可以返回執行這一步
 
 執行
 
@@ -434,11 +444,11 @@ emerge --ask --verbose --update --deep --newuse @world
 
 > 簡便表達，可以使用 `-avuDN`
 
-即可
-
 > 可以考慮加入 `--getbinpkg` 以使用二進制包；簡便表達爲 `-g`，也就是 `emerge -agvuDN @world`
 
-#### 設定 locale
+即可
+
+#### 設定區域格式
 
 > 這一步與手動安裝 Arch Linux 的非常相似
 
@@ -450,7 +460,7 @@ emerge --ask --verbose --update --deep --newuse @world
 locale-gen
 ```
 
-以生成 locale
+以生成區域格式
 
 執行
 
@@ -458,7 +468,7 @@ locale-gen
 eselect locale list
 ```
 
-以檢視 locale 列表
+以檢視區域格式列表
 
 使用
 
@@ -466,7 +476,7 @@ eselect locale list
 eselect locale set <ID>
 ```
 
-以設定全域 locale
+以設定全域區域格式
 
 最後執行
 
@@ -474,7 +484,7 @@ eselect locale set <ID>
 env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 ```
 
-以套用 locale 變更
+以套用區域格式變更
 
 #### 設定時區
 
@@ -488,9 +498,9 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
 
 #### 安裝 Linux 內核及韌體
 
-- 以將 `systemd` 作爲 init 程式並使用 `systemd-boot` 啓動 `dracut` 建立的 `gentoo-kernel-bin` 的 Unified Kernel Image 爲例
+- 以將 `systemd` 作爲 init 程式並使用 `systemd-boot` 啓動 `dracut` 建立的 `gentoo-kernel-bin` 的 Unified Kernel Image (UKI) 爲例
 
-1. 加入 `installkernel` 包對 `dracut` `systemd-boot` 以及 UKI 的支援
+  1. 加入 `installkernel` 包對 `dracut` `systemd-boot` 以及 UKI 的支援
    
    執行
 
@@ -504,7 +514,7 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
    sys-kernel/installkernel dracut uki systemd-boot systemd
    ```
 
-2. 加入 `systemd` 包的 `systemd-boot` 支援
+  2. 加入 `systemd` 包的 `systemd-boot` 支援
 
    執行
 
@@ -518,7 +528,7 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
    sys-apps/systemd boot
    ```
 
-3. 安裝 Linux 韌體及內核
+  3. 安裝 Linux 韌體及內核
    
    執行
 
@@ -528,16 +538,16 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
 
    > 使用 `gentoo-kernel-bin` 是爲了節省安裝的時間，對於 Intel CPU ，必須於此安裝 `intel-microcode`，AMD CPU 的微碼已包含於 `linux-firmware` 中
 
-4. 變更 `dracut` 設定
+  4. 變更 `dracut` 設定
    
    使用 `nano` 編輯 `/etc/dracut.conf`
 
    寫入
 
    ```
-   uefi="yes"
-   hostonly="yes"
-   kernel_cmdline="所需執行的命令"
+   uefi="yes"    # 支援 UEFI 啓動，UKI 必須啓用
+   hostonly="yes"    # 建立適用於本機的精簡 initramfs，節約磁碟空間
+   kernel_cmdline="所需執行的命令"    # 一般而言需要指定根目錄所在分割及其挂載選項
    ```
 
    > 同樣的，`dracut` 也支援分類管理配置檔案，建立 `/etc/dracut.conf.d/` 資料夾並於此加入配置檔案
@@ -552,7 +562,11 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
    >
    > `rw`
    >
-   > 填入時請以空格分隔
+   > 填入時請以逗號分隔
+
+   **請注意，根目錄位於 LVM 邏輯卷中的讀者請不要在 KERNEL_CMDLINE 使用 UUID 指定根目錄**
+
+   **可以使用 `root=/dev/mapper/<VG 名稱>-<LV 名稱>`**
 
 - 以將 `OpenRC` 作爲 init 程式並使用 `systemd-boot` 啓動 `dracut` 建立的 `gentoo-kernel-bin` 的 Unified Kernel Image 爲例
 
@@ -598,6 +612,10 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
   | UUID=<分割UUID> | /boot | vfat | defaults | 0 | 2 |
   | UUID=<分割UUID> | /home | f2fs | defaults | 0 | 2 |
 
+  **請注意，使用 LVM 的讀者請不要在 `/etc/fstab` 使用 UUID 指派挂載點**
+
+  **可以使用 `/dev/mapper/<VG 名稱>-<LV 名稱>`**
+
 #### 設定 root 密碼及加入使用者賬戶
 
 1. 設定密碼及加入使用者賬戶
@@ -636,35 +654,37 @@ emerge -a sudo
 
 以安裝 `sudo`
 
-使用 `nano` 編輯 `/etc/sudoers`
+使用 `nano` 編輯 `/etc/sudoers` 以允許使用者使用 `sudo`
 
 #### 設定 init 程式
 
 - 對於 `systemd`
 
-執行
+  執行
 
-```sh
-systemd-machine-id-setup
-systemd-firstboot --prompt
-```
+  ```sh
+  systemd-machine-id-setup
+  systemd-firstboot --prompt
+  ```
 
-並按提示進行設定
+  並按提示進行設定
 
-```sh
-systemctl preset-all --preset-mode=enable-only
-systemctl preset-all
-```
+  ```sh
+  systemctl preset-all --preset-mode=enable-only
+  systemctl preset-all
+  ```
 
-以載入所有服務的預設設定
+  以載入所有服務的預設設定
 
 - 對於 `OpenRC`
 
-請分別閱讀並按需修改 `/etc/rc.conf` `/etc/conf.d/keymaps` `/etc/conf.d/hwclock`
+  建立 `/etc/hostname` 並寫入主機名
 
-> 建議於 `/etc/rc.conf` 中啓用 `rc_logger="YES"`
+  請分別閱讀並按需修改 `/etc/rc.conf` `/etc/conf.d/keymaps` `/etc/conf.d/hwclock`
 
-#### 設定 Internet
+  > 建議於 `/etc/rc.conf` 中啓用 `rc_logger="YES"`
+
+#### 設定網路介面卡
 
 > 以使用 `networkmanager` 爲例
 
@@ -680,19 +700,19 @@ emerge -ag networkmanager
 
 - 對於 `systemd`
 
-```sh
-systemctl enable NetworkManager
-```
+  ```sh
+  systemctl enable NetworkManager
+  ```
 
 - 對於 `OpenRC`
 
-```sh
-rc-update add NetworkManager default
-```
+  ```sh
+  rc-update add NetworkManager default
+  ```
 
 #### 安裝作業系統工具
 
-1. 效能優化
+1. 磁碟排程效能優化
    
    安裝 `io-scheduler-udev-rules`
 
@@ -700,7 +720,7 @@ rc-update add NetworkManager default
    
    安裝 `mlocate`
 
-3. `bash` 補全
+3. `bash` 命令補全
 
    安裝 `bash-completion`
 
@@ -710,13 +730,14 @@ rc-update add NetworkManager default
 
    > 例如，本機使用的是 btrfs, f2fs, FAT32 以及 LVM
 
-   > 則應安裝 `btrfs-progs` `f2fs-tools` `dosfstools` `lvm2`
+   > 則應安裝 `btrfs-progs` `f2fs-tools` `dosfstools` `lvm2[lvm]`
 
 5. WLAN 工具
    
    安裝 `iw` `wpa_supplicant`
 
 - 對於 `OpenRC` init，還需要安裝如下工具
+  
   `app-admin/sysklogd`
   `sys-process/cronie`
   `net-misc/chrony`
@@ -727,6 +748,7 @@ rc-update add NetworkManager default
   rc-update add sysklogd default
   rc-update add cronie default 
   rc-update add chronyd default
+  ```
 
 #### 安裝啓動載入器
 
@@ -762,22 +784,25 @@ bootctl list
 > emerge -a --config <所安裝的內核>
 > ```
 >
-> 最後，檢查啓動項目
+> 以重新建立 initramfs
+
+> 最後，執行 `bootctl list` 檢查啓動項目
 
 #### 重新開機進入 Gentoo Linux
 
-於 chroot 環境中執行 `exit`
+於 chroot 環境中執行 `exit` 或同時按下 `Control` 和 `D`
 
-執行
+返回 Live ISO 環境後執行
 
 ```sh
 cd
 umount -l /mnt/gentoo/dev{/shm,/pts,} 
 umount -R /mnt/gentoo 
-reboot
 ```
 
-於開機選單中選擇 Linux Boot Manager 或 UEFI OS 以進入 Gentoo Linux
+以取消挂載新系統的分割區
+
+現在，重啓計算機並於開機選單中選擇 Linux Boot Manager 或 UEFI OS 以進入 `systemd-boot` 以啓動 Gentoo Linux
 
 ### 設定 Gentoo Linux 的 GUI
 
@@ -848,7 +873,7 @@ reboot
 
   - 對於 `systemd`
 
-  使用者權限執行
+  以使用者權限執行
 
   ```sh
   systemctl --user enable pipewire
