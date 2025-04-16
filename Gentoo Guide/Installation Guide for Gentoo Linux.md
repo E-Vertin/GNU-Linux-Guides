@@ -1,5 +1,9 @@
 # Installation Guide for Gentoo Linux
 
+> 本文僅適用於對 GNU/Linux 有一定使用經驗且意欲執行 Gentoo Linux 的簡單安裝的讀者，因此並不會涉及每一步驟的解釋及其原理。
+
+> 簡而言之，雖然“複製 - 粘貼 - 執行”並非是本文的目的，但讀者可以以此簡要地瞭解 Gentoo Linux 的安裝流程並推廣至其他桌面環境以及分割表。
+
 > Gentoo Linux 是基於源碼構建的作業系統，因此其對於絕大多數的硬體都有極好的相容性，此處以 amd64 (x86_64) 架構的計算機的安装为例。
 
 ## 1. 歸檔並燒錄映像檔
@@ -22,7 +26,9 @@
 
 磁碟至少包含兩個分割，分別掛載於 `/boot` 和 `/`
 
-> 慾獨立 `/home` `/usr` `/opt` 分割，請按需調整
+> 慾獨立 `/home` `/usr` `/opt` 分割，請按需調整。
+>
+> 使用 btrfs 檔案系統時，可以考慮使用其子卷機制代替獨立的分割。
 
 - `/boot` 用作 EFI System Partition 分割時至少需要 1 GB
 
@@ -55,7 +61,7 @@
   > tmpfs           /var/tmp/portage                tmpfs   size=<大小>G,uid=portage,gid=portage,mode=775    0 0
   > ```
 
-- 對於其他獨立的分割，建議使用 f2fs （機械硬碟可以使用 XFS）
+- 對於其他獨立的分割區，建議使用 F2FS （機械硬碟可以使用 XFS）
 
 ### 連線至 Internet 並校準時間
 
@@ -84,6 +90,12 @@ timedatectl set-timezone <時區>
 timedatectl set-timezone Asia/Hong_Kong
 ```
 
+之後，可以重新啓動 `systemd-timesyncd.service` 以手動同步化時間。
+
+```sh
+systemctl restart systemd-timesyncd
+```
+
 #### 對於 `OpenRC`
 
 執行
@@ -91,6 +103,14 @@ timedatectl set-timezone Asia/Hong_Kong
 ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
 ```
 以設定時區
+
+根據時間同步化服務按需重啓服務
+
+例如 `chrony`
+
+```sh
+rc-service chronyd restart
+```
 
 ## 開始 Gentoo Linux 的安裝作業
 
@@ -102,17 +122,17 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
 
 - 掛載磁碟分割
 
-1. 建立 `/mnt/gentoo` 資料夾
+  1. 建立 `/mnt/gentoo` 資料夾
    
-2. 掛載作爲根目錄的磁碟分割或 btrfs 子卷至 `/mnt/gentoo` 並建立 `/mnt/gentoo/boot` `/mnt/gentoo/home` 以及其他您獨立掛載的作爲掛載點的資料夾
+  2. 掛載作爲根目錄的磁碟分割或 btrfs 子卷至 `/mnt/gentoo` 並建立 `/mnt/gentoo/boot` `/mnt/gentoo/home` 以及其他您獨立掛載的作爲掛載點的資料夾
    
-3. 掛載所有磁碟分割或子卷
+  3. 掛載所有磁碟分割或子卷
 
 - 安裝 stage3 檔案
 
-1. 切換目錄至 `/mnt/gentoo`
+  1. 切換目錄至 `/mnt/gentoo`
    
-2. 使用 `links` 或 `wget` 歸檔 stage3 檔案
+  2. 使用 `links` 或 `wget` 歸檔 stage3 檔案
    
 例如
 
@@ -120,27 +140,25 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
 links https://mirrors.cernet.edu.cn/gentoo/releases/amd64/autobuilds/
 ```
 
-選擇一個資料夾
+- 選擇一個資料夾
 
-對於 `systemd` 請使用 `current-stage3-amd64-desktop-systemd` 中的檔案
+  對於 `systemd` 請使用 `current-stage3-amd64-desktop-systemd` 中的檔案
 
-對於 `OpenRC` 請使用 `current-stage3-amd64-desktop-openrc` 中的檔案
+  對於 `OpenRC` 請使用 `current-stage3-amd64-desktop-openrc` 中的檔案
 
-歸檔完成後，請按需執行檔案校驗
+- 歸檔完成後，請按需執行檔案校驗並解壓 stage3 檔案
 
-1. 解壓 stage3 檔案
+  於 `/mnt/gentoo` 目錄中執行
 
-於 `/mnt/gentoo` 目錄中執行
+  ```sh
+  tar xpf stage3-amd64-desktop-<init 程式>-<時間戳>.tar.xz --xattrs-include='*.*' --numeric-owner
+  ```
 
-```sh
-tar xpf stage3-amd64-desktop-<init>-<time>.tar.xz --xattrs-include='*.*' --numeric-owner
-```
-
-以解壓縮 stage3 檔案至根目錄
+  以解壓縮 stage3 檔案至新的根目錄
 
 ### 調整 `portage` 設定
 
-> `portage` 是一個極其強大的包管理員，其靈活程度令人難以置信
+> `portage` 是 Gentoo Linux 的包管理體系，是 Gentoo 的核心
 
 #### 變更 `make.conf` 設定
 
@@ -165,6 +183,8 @@ COMMON_FLAGS="-march=x86-64 -O2 -pipe"
 ```
 
 > 若您的 CPU 是 x86-64-v3 的微架構，可以考慮使用 `-march=x86-64-v3`；若支援 AVX512，可以考慮使用 `-march=x86-64-v4`
+
+> 慾使用編譯器檢測的原生微架構，可使用 `-march=native`，此舉會讓本機編譯安裝的二進制檔案無法在別的微架構的 CPU 上如期運作
 
 > 根據 Gentoo Handbook，`-O2` 是最合適的等級，`-O3` 可以稍微加快速度，但 “某些時候會出現問題”
 
