@@ -4,7 +4,7 @@
 
 > 簡而言之，雖然“複製 - 粘貼 - 執行”並非本文之目的，但讀者可以藉此簡要地瞭解 Gentoo Linux 的安裝流程並推廣至其他桌面環境以及分割表配置。
 
-> Gentoo Linux 是基於源碼構建的作業系統，因此其對於絕大多數的硬體都有極好的相容性，此處以 amd64 (x86_64) 架構的計算機的安装为例。
+> Gentoo Linux 是基於源碼構建的作業系統，因此其對於絕大多數的硬體都有極好的相容性，此處以 amd64 (x86_64) 架構且使用 UEFI BIOS 的計算機的安装为例。
 
 ## 1. 歸檔並燒錄映像檔
 
@@ -24,26 +24,41 @@
 
 #### 調整磁碟分割表
 
-磁碟至少包含兩個分割，分別掛載於 `/boot` 和 `/`
+> 本文僅以支援 UEFI BIOS 的裝置爲例，若需要實現同時支援從 MBR 和 GUID 分割表啓動，請自行參閲相關文章。
+
+磁碟至少包含兩個分割，分別用於挂載根目錄和 EFI System Partition
 
 > 慾獨立 `/home` `/usr` `/opt` 分割，請按需調整。
->
-> 使用 btrfs 檔案系統建立多磁碟容器時，可以考慮使用其子卷機制代替獨立的分割。
 
-- `/boot` 用作 EFI System Partition 分割時至少需要 1 GB
+> 使用 btrfs 檔案系統建立多磁碟容器時，可以考慮使用其子卷機制代替獨立分割。
 
-- `/` 可以按需調整，建議 40 GB 及以上
+- EFI System Partition 分割至少需要 500 MB
+
+  關於在單個磁碟上使用同一個 ESP 分割，其挂載點有兩個建議的選擇：
+
+  > 若磁碟上存在非 GNU/Linux 作業系統，如 Windows，請謹慎考慮使用單個 ESP ！
+
+  | 挂載點 | 優勢 | 劣勢 |
+  | - | - | - |
+  | `/boot` | 可執行 EFI 檔案與内核映像位於同一分割，便於管理維護 ESP 且擁有最佳相容性 | 可能會篡改其他 GNU/Linux 作業系統的相關檔案且所需空間較大 |
+  | `/efi` | 分離内核映像與實現 UEFI 啓動所需檔案，避免篡改其他 GNU/Linux 作業系統的相關檔案 | *冇得彈* |
+  
+  > 根據 [Gentoo Wiki](https://wiki.gentoo.org/wiki/EFI_System_Partition#Optional:_autofs)，不推薦將 ESP 挂載於 `/boot/efi` 
+
+  > 若為不同作業系統建立不同的 ESP，以上兩者均可
+
+- 根目錄可以按需調整，建議 40 GB 及以上
 
 - `swap` 按需建立，但建議安裝的 RAM 较大 (64 GB 及以上) 的計算機不建立
 
-此爲 Gentoo Handbook 中對 `swap` 的建議
+  此爲 Gentoo Handbook 中對 `swap` 的建議
 
-| RAM size | With suspend support | With hibernation support |
-| - | - | - |
-| 2 GB or less | 2*RAM | 3*RAM |
-| 2 to 8 GB | RAM amount | 2*RAM |
-| 8 to 64 GB | 8 GB minimum, 16 GB maximum | 1.5*RAM |
-| 64 GB or greater | 8 GB minimum | Hibernation **not RECOMMENDED**! |
+  | RAM size | With suspend support | With hibernation support |
+  | - | - | - |
+  | 2 GB or less | 2*RAM | 3*RAM |
+  | 2 to 8 GB | RAM amount | 2*RAM |
+  | 8 to 64 GB | 8 GB minimum, 16 GB maximum | 1.5*RAM |
+  | 64 GB or greater | 8 GB minimum | Hibernation **not RECOMMENDED**! |
 
 #### 建立檔案系統
 
