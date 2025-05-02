@@ -217,7 +217,26 @@ MAKEOPTS="-j12 -l12"
 
 兩個數值均爲 CPU 的執行緒數量或 RAM 的一半並於兩者中取最小值。
 
-3. 加入 Gentoo 倉庫鏡像
+3. 調整 `portage` 進程的優先級及並行作業數量
+
+加入行
+```
+PORTAGE_SCHEDULING_POLICY="idle"
+```
+
+以規定 `portage` 自身及其建立的進程的優先級爲 idle，減少安裝程式時對電腦日常使用的影響
+
+加入行
+```
+EMERGE_DEFAULT_OPTS="--jobs 4"
+```
+
+以規定 `portage` 最大並行作業爲 4
+
+> 建議單個作業至少分配 4 個執行緒，上述例子寫入了 `MAKEOPTS="-j12 -l12"`，則此處應該爲 `EMERGE_DEFAULT_OPTS="--jobs 3"`
+
+
+4. 加入 Gentoo 倉庫鏡像
 
 加入行
 
@@ -233,17 +252,45 @@ GENTOO_MIRRORS="https://mirrors.tuna.tsinghua.edu.cn/gentoo"
 > GENTOO_MIRRORS="https://mirrors.sustech.edu.cn/gentoo"
 > ```
 
-4. 設定顯示卡
+5. 設定顯示卡
    
 `portage` 會根據 `VIDEO_CARDS` 變數編譯安裝所需的包
 
-例如，本機使用的 4th Gen 或更新的 Intel Integrated GPU 與“現代的” NVIDIA Discrete GPU 且慾使用專用驅動程式，則應該寫入
+- 對於 4th Gen 或更新的 Intel Integrated GPU 以及 Intel ARC GPU
 
-```
-VIDEO_CARDS="intel nvidia"
-```
+  ```
+  VIDEO_CARDS="intel"
+  ```
 
-5. 設定全域 `USE` 變數
+- 對於慾使用專有驅動程式的 NVIDIA GPU
+
+  ```
+  VIDEO_CARDS="nvidia"
+  ```
+
+- 對於 Radeon Integrated GPU 和 Radeon Discrete GPU，請寫入
+
+  ```
+  VIDEO_CARDS="amdgpu radeonsi"
+  ```
+
+- 若使用的是 QEMU/KVM 虛擬機，請啓用
+  ```
+  VIDEO_CARDS="virgl"
+  ```
+
+  以使用 VirtIO 的 OpenGL 加速
+
+請根據自己的硬體配置組合使用上述例子
+
+> 例如，對於一部使用帶有 Radeon Integrated GPU 的 Ryzen CPU 和 NVIDIA Discrete GPU 的筆電，請寫入
+>
+> ```
+> VIDEO_CARDS="amdgpu radeonsi nvidia"
+> ```
+
+
+6. 設定全域 `USE` 變數
 
 加入行
 
@@ -253,17 +300,17 @@ USE=""
 
 並與引號內加入
 
-例如，本機慾使用 X Server, Wayland, KDE Plasma, KVM, Pipewire Sound Server，且優先使用預先編譯的二進制包，對於需要編譯安裝的使用 `jumbo-build` 加速編譯
+例如，本機慾使用 X Server, Wayland, KDE Plasma, Pipewire Sound Server，內核使用 Gentoo 發行版標準內核
 
 可以寫入
 
 ```
-USE="X wayland kde qt kvm pipewire pulseaudio bindist dist-kernel -gnome"
+USE="X wayland kde qt pipewire pulseaudio dist-kernel -gnome"
 ```
 
-6. 設定所接受的“許可證”
+1. 設定所接受的“許可證”
 
-推薦對全域使用如下設定，並於 `portage/package.license/` 資料夾中對某些包進行例外設定
+推薦對全域使用如下設定，並建立 `/etc/portage/package.license/` 資料夾，於其對某些包進行例外設定
 
 ```
 ACCEPT_LICENSE="-* @FREE @BINARY-REDISTRIBUTABLE"
