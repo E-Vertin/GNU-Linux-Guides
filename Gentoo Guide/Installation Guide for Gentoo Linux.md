@@ -368,13 +368,15 @@ sync-uri = https://distfiles.gentoo.org/releases/amd64/binpackages/23.0/x86-64/
 sync-uri = http://mirrors.sustech.edu.cn/gentoo/releases/amd64/binpackages/23.0/x86-64/
 ```
 
+> 若您的 CPU 支援 x86-64-v3，可以考慮啓用
+
 ### 進入 Gentoo Linux 執行後續安裝及設定
 
 #### 使用 `chroot` 進入 Gentoo Linux
 
 1. 拷貝 DNS 解析檔案
 
-> 這一步至關重要，否則有可能無妨存取 Internet
+> 這一步至關重要，否則有可能無法存取 Internet
 
 執行
 
