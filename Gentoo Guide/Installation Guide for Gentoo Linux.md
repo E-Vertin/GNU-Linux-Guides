@@ -300,12 +300,12 @@ USE=""
 
 並與引號內加入
 
-例如，本機慾使用 X Server, Wayland, KDE Plasma, Pipewire Sound Server，內核使用 Gentoo 發行版標準內核
+例如，本機慾使用 X Server, Wayland, KDE Plasma, Pipewire Sound Server，優先使用二進制分發的包，內核使用 Gentoo 發行版標準內核
 
 可以寫入
 
 ```
-USE="X wayland kde qt pipewire pulseaudio dist-kernel -gnome"
+USE="X wayland kde qt pipewire pulseaudio bindist dist-kernel -gnome"
 ```
 
 1. 設定所接受的“許可證”
