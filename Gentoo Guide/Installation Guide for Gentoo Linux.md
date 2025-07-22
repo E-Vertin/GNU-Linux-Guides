@@ -1,6 +1,6 @@
 # Installation Guide for Gentoo Linux
 
-> 本文僅適用於對 GNU/Linux 有一定使用經驗且意欲執行 Gentoo Linux 的簡單安裝的讀者，因此並不會涉及每一步驟的解釋及其原理。
+> 本文僅適用於對 GNU/Linux 有一定使用經驗且意欲執行 Gentoo Linux 的簡單安裝的讀者，因此並不會涉及每一步驟的原理解釋。
 
 > 簡而言之，雖然“複製 - 粘貼 - 執行”並非本文之目的，但讀者可以藉此簡要地瞭解 Gentoo Linux 的安裝流程並推廣至其他桌面環境以及分割表配置。
 
@@ -14,7 +14,7 @@
 
 ## 2. 變更 UEFI BIOS 設定並載入 ISO
 
-> 此處要强調的是 “Live ISO” 環境，使用 Gentoo Linux Live ISO 并不是强制條件。慾使用 GUI 對安裝作業環境進行一定配置，如連線至校園網，請使用 EndeavourOS Live ISO 或任意一個您熟悉的 ISO。
+> 此處要强調的是 “Live ISO” 環境，使用 Gentoo Linux Live ISO 并不是强制條件。慾使用 GUI 對安裝作業環境進行配置，如連線至校園網，建議使用 EndeavourOS Live ISO 或任意一個您熟悉的 ISO。
 
 > 請注意，Gentoo Linux 提供了使用 `OpenRC` init 程式的 Live ISO，請按需取用。
 
@@ -47,7 +47,7 @@
 
   > 若為不同作業系統建立不同的 ESP，以上兩者均可
 
-- 根目錄可以按需調整，建議 40 GB 及以上
+- 根目錄可以按需調整，建議至少 40 GB
 
 - `swap` 按需建立，但建議安裝的 RAM 较大 (64 GB 及以上) 的計算機不建立
 
@@ -62,11 +62,11 @@
 
 #### 建立檔案系統
 
-- 對於 `/boot` 作爲 EFI System Partion 分割，請使用 FAT32
+- 對於 EFI System Partion，請使用 FAT32
 
 - 對於 `/`，建議使用 btrfs，並將 `/var/log` 獨立掛載於一個子卷
 
-  慾進一步細分，還可以將 `/var/cache` 與 `/var/tmp` 獨立掛載爲子卷
+  慾進一步細分，還可以將 `/var/cache` 與 `/var/tmp` 獨立掛載爲子卷 (此兩者分別為 Gentoo portage 的包快取與編譯工作資料夾)
 
   > 若您有足夠的 RAM，可以考慮將 `/var/tmp/portage` 掛載爲 tmpfs 以減少編譯過程中的磁碟讀寫
   >
@@ -76,7 +76,7 @@
   > tmpfs           /var/tmp/portage                tmpfs   size=<大小>G,uid=portage,gid=portage,mode=775    0 0
   > ```
 
-- 對於其他獨立的分割區，建議使用 F2FS （機械硬碟可以使用 XFS）
+- 對於其他獨立的分割區，建議使用 F2FS (機械硬碟可以使用 XFS)
 
 ### 連線至 Internet 並校準時間
 
@@ -94,7 +94,7 @@ timedatectl
 ```sh
 timedatectl list-timezone
 ```
-以列出時區，同樣的，使用 pipe 和 `grep` 以篩選輸出結果。
+以列出時區，同樣的，使用 `|` (pipe) 和 `grep` 以篩選輸出結果。
 
 欲選取作業系統時區，請執行
 ```sh
@@ -139,7 +139,7 @@ rc-service chronyd restart
 
   1. 建立 `/mnt/gentoo` 資料夾
    
-  2. 掛載作爲根目錄的磁碟分割或 btrfs 子卷至 `/mnt/gentoo` 並建立 `/mnt/gentoo/boot` `/mnt/gentoo/home` 以及其他您獨立掛載的作爲掛載點的資料夾
+  2. 掛載作爲根目錄的磁碟分割或 btrfs 子卷至 `/mnt/gentoo` 並建立 `/mnt/gentoo/efi` `/mnt/gentoo/home` 以及其他您欲獨立掛載的掛載點
    
   3. 掛載所有磁碟分割或子卷
 
@@ -169,7 +169,7 @@ links https://mirrors.cernet.edu.cn/gentoo/releases/amd64/autobuilds/
   tar xpf stage3-amd64-desktop-<init 程式>-<時間戳>.tar.xz --xattrs-include='*.*' --numeric-owner
   ```
 
-  以解壓縮 stage3 檔案至新的根目錄
+  以解壓縮 stage3 檔案至目標根目錄
 
 ### 調整 `portage` 設定
 
@@ -207,7 +207,7 @@ COMMON_FLAGS="-march=x86-64 -O2 -pipe"
 
 2. 變更編譯時的執行緒數量及負載
 
-例如本機的 CPU 有 12 條執行緒，RAM 的大小也大於或等於 24 GB，則
+例如本機的 CPU 有 12 條執行緒，RAM 的大小也大於或等於 32 GB，則
 
 加入行
 
@@ -215,7 +215,7 @@ COMMON_FLAGS="-march=x86-64 -O2 -pipe"
 MAKEOPTS="-j12 -l12"
 ```
 
-兩個數值均爲 CPU 的執行緒數量或 RAM 的一半並於兩者中取最小值。
+比較 CPU 的執行緒數量與 RAM 的一半大小，兩者中取最小值填入。
 
 3. 調整 `portage` 進程的優先級及並行作業數量
 
@@ -231,10 +231,7 @@ PORTAGE_SCHEDULING_POLICY="idle"
 EMERGE_DEFAULT_OPTS="--jobs 4"
 ```
 
-以規定 `portage` 最大並行作業爲 4
-
-> 建議單個作業至少分配 4 個執行緒，上述例子寫入了 `MAKEOPTS="-j12 -l12"`，則此處應該爲 `EMERGE_DEFAULT_OPTS="--jobs 3"`
-
+以規定 `portage` 最大並行作業數量爲 4
 
 4. 加入 Gentoo 倉庫鏡像
 
@@ -246,7 +243,7 @@ GENTOO_MIRRORS="https://mirrors.tuna.tsinghua.edu.cn/gentoo"
 
 以使用清華 TUNA 鏡像伺服器
 
-> 鏡像可以根據需求調整，例如廣東省的使用者可以使用 SUSTech CRA 鏡像
+> 鏡像可以根據地理位置調整，例如廣東省的使用者可以使用 SUSTech CRA 鏡像
 >
 > ```
 > GENTOO_MIRRORS="https://mirrors.sustech.edu.cn/gentoo"
@@ -254,7 +251,7 @@ GENTOO_MIRRORS="https://mirrors.tuna.tsinghua.edu.cn/gentoo"
 
 5. 設定顯示卡
    
-`portage` 會根據 `VIDEO_CARDS` 變數編譯安裝所需的包
+`portage` 會根據 `VIDEO_CARDS` 設定編譯安裝所需的包
 
 - 對於 4th Gen 或更新的 Intel Integrated GPU 以及 Intel ARC GPU
 
@@ -300,12 +297,12 @@ USE=""
 
 並與引號內加入
 
-例如，本機慾使用 X Server, Wayland, KDE Plasma, Pipewire Sound Server，優先使用二進制分發的包，內核使用 Gentoo 發行版標準內核
+例如，本機慾使用 X Server, Wayland, KDE Plasma, Pipewire Sound Server, fcitx，並優先使用二進制分發的包，內核使用 Gentoo 發行版標準內核
 
 可以寫入
 
 ```
-USE="X wayland kde qt pipewire pulseaudio bindist dist-kernel -gnome"
+USE="X wayland kde qt pipewire pulseaudio fcitx bindist dist-kernel -gnome"
 ```
 
 1. 設定所接受的“許可證”
@@ -368,7 +365,7 @@ sync-uri = https://distfiles.gentoo.org/releases/amd64/binpackages/23.0/x86-64/
 sync-uri = http://mirrors.sustech.edu.cn/gentoo/releases/amd64/binpackages/23.0/x86-64/
 ```
 
-> 若您的 CPU 支援 x86-64-v3，可以考慮啓用
+> 若您的 CPU 支援 x86-64-v3，可以考慮啓用，將結尾替換爲 x86-64-v3 即可
 
 ### 進入 Gentoo Linux 執行後續安裝及設定
 
@@ -384,7 +381,7 @@ sync-uri = http://mirrors.sustech.edu.cn/gentoo/releases/amd64/binpackages/23.0/
 cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 ```
 
-1. 掛載必要的檔案系統並進入 Gentoo Linux
+2. 掛載必要的檔案系統並進入 Gentoo Linux
 
 - 若您使用的是 Arch Linux 及其衍生版的 Live ISO 或有 `arch-chroot` 程式，這一步非常簡單
 
@@ -516,7 +513,7 @@ emerge --ask --verbose --update --deep --newuse @world
 
 > 這一步與手動安裝 Arch Linux 的非常相似
 
-使用 `nano` 於 `/etc/locale.gen` 反註釋或加入 locale
+使用 `nano` 於 `/etc/locale.gen` 反註釋或手動寫入 locale
 
 執行
 
@@ -616,7 +613,7 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
 
    > 同樣的，`dracut` 也支援分類管理配置檔案，建立 `/etc/dracut.conf.d/` 資料夾並於此加入配置檔案
 
-   > 對於一個使用 btrfs 檔案系統和 NVIDIA GPU 的計算機而言， `kernel_cmdline` 通常包括
+   > 對於一個使用 btrfs 檔案系統的計算機而言， `kernel_cmdline` 通常包括
    >
    > `root=UUID=<分割的UUID>`
    >
@@ -653,7 +650,7 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
 
 - 若使用的是 Arch Linux 及其衍生版的 Live ISO，這一步也非常簡單
 
-  在 Live ISO 環境中以 root 登入
+  於 Live ISO 環境中以 root 登入
 
   執行
 
@@ -661,19 +658,19 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
   genfstab -U /mnt/gentoo > /mnt/gentoo/etc/fstab
   ```
 
-  隨後回到 chroot 環境使用 `nano` 按需求修改 `/etc/fstab` 變更掛載設定
+  回到 chroot 環境使用 `nano` 按需求修改 `/etc/fstab` 以變更掛載設定
 
 - 若使用的 Live ISO 沒有 `genfstab`
 
   使用 `nano` 撰寫 `/etc/fstab`
 
-  > 一個以 `/boot` 爲 EFI 分割，`/` 使用 btrfs 且獨立 `/home` 使用 f2fs 的設定應該是這樣的
+  > 一個以 `/efi` 爲 EFI 分割，`/` 使用 btrfs 且獨立 `/home` 使用 f2fs 的設定應該是這樣的
 
   | UUID | Mount point | Filesystem type | Options | Dump | Filesystem check |
   | - | - | - | - | - | - |
   | UUID=<分割UUID> | / | btrfs | defaults,subvol=<根目錄所在子卷> | 0 | 1 |
   | UUID=<分割UUID> | /var/log | btrfs | defaults,subvol=<日誌目錄所在子卷> | 0 | 2 |
-  | UUID=<分割UUID> | /boot | vfat | defaults | 0 | 2 |
+  | UUID=<分割UUID> | /efi | vfat | defaults | 0 | 2 |
   | UUID=<分割UUID> | /home | f2fs | defaults | 0 | 2 |
 
   **請注意，使用 LVM 的讀者請不要在 `/etc/fstab` 使用 UUID 指派挂載點**
@@ -698,7 +695,7 @@ passwd
 useradd -m -G wheel <使用者名稱>
 ```
 
-以加入使用者賬戶並將其加入 wheel 羣組
+以加入使用者賬戶並將其加入 wheel 特權組
 
 執行
 
@@ -800,6 +797,8 @@ emerge -ag networkmanager
    
    安裝 `iw` `wpa_supplicant`
 
+   > 爲了更好的相容性，`net-wireless/wpa_supplicant` 還可以加入 `tkip` USE Flag
+
 - 對於 `OpenRC` init，還需要安裝如下工具
   
   `app-admin/sysklogd`
@@ -832,7 +831,7 @@ bootctl list
 
 檢查啓動項目
 
-> 注意：若使用了 LVM，則應該爲包 `sys-fs/lvm2` 加入 `lvm` 的 `USE Flags`，並在 `dracut` 中要求加入 `lvm` 模塊
+> 注意：若使用了 LVM，則應該爲包 `sys-fs/lvm2` 加入 `lvm` 的 USE Flag，並在 `dracut` 中要求加入 `lvm` 模塊
 
 > 使用 `nano` 編輯 `/etc/dracut.conf`
 >
@@ -845,7 +844,7 @@ bootctl list
 > 執行
 >
 > ```sh
-> emerge -a --config <所安裝的內核>
+> emerge -a --config <所安裝的內核包>
 > ```
 >
 > 以重新建立 initramfs
@@ -860,8 +859,7 @@ bootctl list
 
 ```sh
 cd
-umount -l /mnt/gentoo/dev{/shm,/pts,} 
-umount -R /mnt/gentoo 
+umount -Rl /mnt/gentoo/
 ```
 
 以取消挂載新系統的分割區
