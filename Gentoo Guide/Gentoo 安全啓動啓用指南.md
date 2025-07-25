@@ -1,4 +1,4 @@
-# Instructions For Enabling Secure Boot via `Shim` On Gentoo Linux
+# Gentoo 安全啓動啓用指南
 
 ## 前言
 
@@ -60,7 +60,7 @@ emerge -auDN @world
 
 以套用變更
 
-> 此舉 `portage` 將會自動爲已安裝的所有 Distribution Kernel（例如 `sys-kernel/gentoo-kernel-bin`）, 3rd-Party Modules（例如 `x11-drivers/nvidia-drivers`） 以及 Bootloader 簽名
+> 此舉 `portage` 將會自動爲已安裝的所有支援的包重新編譯並簽名
 
 **請注意，對於自行編譯的內核請加入自行建立的簽章**
 
@@ -123,7 +123,7 @@ efibootmgr --disk /dev/<你的 ESP 分割區所在磁碟> --part <第幾個分�
 > nvme1n1       259:7    0   1.9T  0 disk 
 >   ├─nvme1n1p1 259:8    0    16M  0 part 
 >   ├─nvme1n1p2 259:9    0 953.9G  0 part 
->   ├─nvme1n1p3 259:10   0     1G  0 part /boot
+>   ├─nvme1n1p3 259:10   0     1G  0 part /efi
 >   ├─nvme1n1p4 259:11   0   100G  0 part /
 >   └─nvme1n1p5 259:12   0    80G  0 part /home
 > ```
@@ -170,7 +170,7 @@ uefi_secureboot_cert="<簽章的絕對位址>"
 
 > 注意：若需要手動簽名，可以執行
 > ```sh
-> sbsign --key <私鑰的絕對位址> --cert <簽章的絕對位址> --output /<ESP 分割區>/EFI/Linux/<UKI 檔案名>.efi /<ESP 分割區>/EFI/Linux/<UKI 檔案名>.efi
+> sbsign --key <私鑰的絕對位址> --cert <簽章的絕對位址> --output /<ESP 分割區>/EFI/Linux/<UKI 檔案名> /<ESP 分割區>/EFI/Linux/<UKI 檔案名>
 > ```
 
 ## 6. 於 Machine Owner Key Manager 錄入自行建立的密鑰
