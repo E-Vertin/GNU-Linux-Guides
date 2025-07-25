@@ -1,4 +1,4 @@
-# Tips for Using Gentoo Linux
+# Gentoo 使用貼士
 
 ## 前言
 
@@ -14,7 +14,7 @@ Gentoo Linux 的 `portage` 包管理員以其靈活程度與精細化控制著�
 
 執行
 ```sh
-sudo eix -s <包名>
+eix -s <包名>
 ```
 
 以檢視某個包提供的所有 `USE Flags`
@@ -24,7 +24,7 @@ sudo eix -s <包名>
 照常更新整個系統即可，執行
 
 ```sh
-sudo emerge -auDN @world
+emerge -auDN @world
 ```
 
 > 同樣地，可以加入 `-g` 以使用二進制包加快安裝速度
@@ -48,7 +48,7 @@ Gentoo 倉庫提供的 VS Code 有如下 `USE Flags`：
 app-editors/vscode egl wayland
 ```
 
-> 若已經於 `/etc/portage/make.conf` 中全域啓用 `wayland` 的 `USE Flags`，則不需要加入該 `USE Flags`
+> 若已經於 `/etc/portage/make.conf` 中全域啓用 `wayland` 的 `USE Flags`，則不需要於此再次加入
 
 ## Libre Office 及其多語言設定
 
@@ -60,7 +60,7 @@ Gentoo 倉庫提供的 Libre Office 二進制包有如下 `USE Flags`：
 - `kde` Add support for software made by KDE, a free software community.
 - `java`    Add support for Java.
   
-通常情況下，Profile 與 `/etc/portage/make.conf` 已全域啓用 `gnome` 或 `kde`
+通常情況下，Profile 與 `/etc/portage/make.conf` 已全域啓用 `gnome` 或 `kde`，因此只需要考慮是否使用 `jave`
 
 Gentoo 倉庫提供的 `USE Flags` 爲 Libre Office 所有支援的語言，並以 `USE_EXPAND Flags` 呈現：
 
@@ -96,7 +96,7 @@ Gentoo 倉庫提供的 QEMU 除了常規的 `USE Flags` 還提供了 `PYTHON_TAR
 
 簡單地說，`QEMU_SOFTMMU_TARGETS` 就是虛擬機要模擬的架構，而 `QEMU_USER_TARGETS` 是宿主機的架構，`PYTHON_TARGETS` 則控制了該包取用的 Python 版本
 
-例如宿主機爲 x86_64 的架構，並且想要模擬 ARM 和 x86_64 架構
+例如宿主機爲 amd64 的架構，並且想要模擬 aarch64 和 amd64 架構
 
 在 `/etc/portage/package.use/qemu` 中寫入
 
