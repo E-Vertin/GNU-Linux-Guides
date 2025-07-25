@@ -1,57 +1,57 @@
 # Installation Guide for Gentoo Linux
 
-> 本文僅適用於對 GNU/Linux 有一定使用經驗且意欲執行 Gentoo Linux 的簡單安裝的讀者，因此並不會涉及每一步驟的原理解釋。
+> This passage only applies to users who have experience using GNU/Linux and are moving forward to perform a simple installation of Gentoo Linux, so articulation limited.
 
-> 簡而言之，雖然“複製 - 粘貼 - 執行”並非本文之目的，但讀者可以藉此簡要地瞭解 Gentoo Linux 的安裝流程並推廣至其他桌面環境以及分割表配置。
+> Anyway, "copy - paste - run" is not my intention to compile this article, but to give readers a glimpse to the installing procedure of Gentoo Linux thus they can apply what they have learned here to other desktop environment and file system table configurations.
 
-> Gentoo Linux 是基於源碼構建的作業系統，因此其對於絕大多數的硬體都有極好的相容性，此處以 amd64 (x86_64) 架構且使用 UEFI BIOS 的計算機的安装为例。
+> Gentoo Linux is based on source code, so it's compatible the most hardware as long as they can execute a C/C++ toolchain. Here we'll take amd64 (x86_64) with UEFI BIOS as an example.
 
-## 1. 歸檔並燒錄映像檔
+## 1. Archive and burn the installation media
 
-前往 [官方網站](https://www.gentoo.org/downloads/) 選擇鏡像並歸檔映像檔
+Head to the [Gentoo Linux download page](https://www.gentoo.org/downloads/) and download the latest installation ISO image.
 
-使用 [Etcher](https://etcher.balena.io/) 燒錄映像檔至 USB Disk
+Burn the ISO image to a USB flash drive or DVD. If you are using a USB flash drive, you can use tools like `dd` on Linux or Rufus on Windows to create a bootable USB. [Etcher](https://etcher.balena.io/) is cross-platform and user-friendly for this purpose.
 
-## 2. 變更 UEFI BIOS 設定並載入 ISO
+## 2. Manipulate the UEFI BIOS settings
 
-> 此處要强調的是 “Live ISO” 環境，使用 Gentoo Linux Live ISO 并不是强制條件。慾使用 GUI 對安裝作業環境進行配置，如連線至校園網，建議使用 EndeavourOS Live ISO 或任意一個您熟悉的 ISO。
+> What we're trying to imply here is a *Live ISO* environment that allows you to install Gentoo Linux. Live ISOs ditributed by Gentoo Linux is not a must. If you want to configure your installation environment, connecting to the Internet via an education network plan for example, it's recommended to use EndeavourOS Live ISO or any others that you familiar with.
 
-> 請注意，Gentoo Linux 提供了使用 `OpenRC` init 程式的 Live ISO，請按需取用。
+> Please note that Gentoo Linux provides Live ISOs with `OpenRC` init, use it if you like.
 
-## 3. 執行安裝作業前的準備
+## 3. Prepare for installation
 
-### 準備磁碟
+### Prepare you disk
 
-#### 調整磁碟分割表
+#### Alternate your disk partition table
 
-> 本文僅以支援 UEFI BIOS 的裝置爲例，若需要實現同時支援從 MBR 和 GUID 分割表啓動，請自行參閲相關文章。
+> The example for this step is based on a GPT partition table, which is recommended for UEFI systems. If you need MBR and GPT dual booting, you can refer to related articles.
 
-磁碟至少包含兩個分割，分別用於挂載根目錄和 EFI System Partition
+You should have at least two partitions: one for the root filesystem and one for the EFI System Partition (ESP). The ESP is required for UEFI booting.
 
-> 慾獨立 `/home` `/usr` `/opt` 分割，請按需調整。
+> To make `/home` `/usr` `/opt` independent partitions, you can create additional partitions as needed.
 
-> 使用 btrfs 檔案系統建立多磁碟容器時，可以考慮使用其子卷機制代替獨立分割。
+> Consider using subvolumes with btrfs is you are to create storage pools across multiple disks.
 
-- EFI System Partition 分割至少需要 500 MB
+- EFI System Partition (ESP) will need at least 500 MB
 
-  關於在單個磁碟上使用同一個 ESP 分割，其挂載點有兩個建議的選擇：
+  Two options for using the same and only ESP on a single disk:
 
-  > 若磁碟上存在非 GNU/Linux 作業系統，如 Windows，請謹慎考慮使用單個 ESP ！
+  > If there's not only one GNU/Linux installation on the single disk, let's take Windows as an example, please be cautious to proceed!
 
-  | 挂載點 | 優勢 | 劣勢 |
-  | - | - | - |
-  | `/boot` | 可執行 EFI 檔案與内核映像位於同一分割，便於管理維護 ESP 且擁有最佳相容性 | 可能會篡改其他 GNU/Linux 作業系統的相關檔案且所需空間較大 |
-  | `/efi` | 分離内核映像與實現 UEFI 啓動所需檔案，避免篡改其他 GNU/Linux 作業系統的相關檔案 | *冇得彈* |
-  
-  > 根據 [Gentoo Wiki](https://wiki.gentoo.org/wiki/EFI_System_Partition#Optional:_autofs)，不推薦將 ESP 挂載於 `/boot/efi` 
+  | Mount Point | Pros | Cons |
+  |-------------|------|------|
+  | `/boot` | Executable EFI images and kernel images reside in the same partion for compatibility and convenient maintainance | May interfere with other GNU/Linux installations, especially if they use different bootloaders and takes more space on disk |
+  | `/efi` | Seperate kernel images and files crutial for UEFI booting, avoiding interference with other GNU/Linux installations | *It just works* |
 
-  > 若為不同作業系統建立不同的 ESP，以上兩者均可
+  > According to [Gentoo Wiki](https://wiki.gentoo.org/wiki/EFI_System_Partition#Optional:_autofs), it's not recommended to mount your ESP to `/boot/efi`.
 
-- 根目錄可以按需調整，建議至少 40 GB
+  > If you are to create different ESPs for different operating systems, you can do both as illustrated above.
 
-- `swap` 按需建立，但建議安裝的 RAM 较大 (64 GB 及以上) 的計算機不建立
+- Root file system partition can be adjusted according to your needs, but at least 40 GB is recommended.
 
-  此爲 Gentoo Handbook 中對 `swap` 的建議
+- Create `swap` according to your needs, but at least 2 GB is recommended. If you have enough RAM (64 GB and above), you can skip this step.
+
+  Recommendations in the Gentoo Handbook:
 
   | RAM size | With suspend support | With hibernation support |
   | - | - | - |
@@ -60,828 +60,724 @@
   | 8 to 64 GB | 8 GB minimum, 16 GB maximum | 1.5*RAM |
   | 64 GB or greater | 8 GB minimum | Hibernation **not RECOMMENDED**! |
 
-#### 建立檔案系統
+#### Create file systems
 
-- 對於 EFI System Partion，請使用 FAT32
+- For ESP, please use FAT32 file system.
 
-- 對於 `/`，建議使用 btrfs，並將 `/var/log` 獨立掛載於一個子卷
+- For root file system, it's recommended to use btrfs and seperate `/var/log` as an independent subvolume.
+  
+  To spilt up further, you can create subvolumes for `/var/cache` and `/var/tmp` as well, where Gentoo portage stores its temporary files and cache.
 
-  慾進一步細分，還可以將 `/var/cache` 與 `/var/tmp` 獨立掛載爲子卷 (此兩者分別為 Gentoo portage 的包快取與編譯工作資料夾)
-
-  > 若您有足夠的 RAM，可以考慮將 `/var/tmp/portage` 掛載爲 tmpfs 以減少編譯過程中的磁碟讀寫
+  > If you have enough RAM, you can use tmpfs for `/var/tmp/portage` to speed up the installation process.
   >
-  > 於 `/etc/fstab` 中加入
+  > Append the following line to `/etc/fstab` to mount it automatically:
   >
   > ```
-  > tmpfs           /var/tmp/portage                tmpfs   size=<大小>G,uid=portage,gid=portage,mode=775    0 0
+  > tmpfs   /var/tmp/portage    tmpfs   size=<insert value>G,uid=portage,gid=portage,mode=775    0 0
   > ```
 
-- 對於其他獨立的分割區，建議使用 F2FS (機械硬碟可以使用 XFS)
+- As for other independent partitions, you can use F2FS on SSDs and XFS on HDDs, or any other file systems you prefer.
 
-### 連線至 Internet 並校準時間
+### Connect to Internet and update the system clock
 
-此舉是爲歸檔並解壓 stage3 檔案做準備
+This is for archiving and extracting the stage3 tarball.
 
-#### 對於 `systemd`
+#### System clock update for `systemd` users
 
-執行
-```sh
-timedatectl 
+Execute the following command to check the system clock:
+
+```bash
+timedatectl status
 ```
-以檢查作業系統時間狀態。
 
-執行
-```sh
-timedatectl list-timezone
-```
-以列出時區，同樣的，使用 `|` (pipe) 和 `grep` 以篩選輸出結果。
+Execute the following command to set the system clock to list supported time zones:
 
-欲選取作業系統時區，請執行
-```sh
-timedatectl set-timezone <時區>
+```bash
+timedatectl list-timezones
 ```
-例如
-```sh
+
+> Hints: You can use `grep` to filter the output, for example, `timedatectl list-timezones | grep Asia`.
+
+Execute the following command to set the system clock to your desired time zone:
+
+```bash
+timedatectl set-timezone <Your_Time_Zone>
+```
+
+For example, if you are in Hong Kong, you can set it to:
+
+```bash
 timedatectl set-timezone Asia/Hong_Kong
 ```
 
-之後，可以重新啓動 `systemd-timesyncd.service` 以手動同步化時間。
+Then, you can manually restart `systemd-timesyncd` to synchronize the system clock:
 
-```sh
+```bash
 systemctl restart systemd-timesyncd
 ```
 
-#### 對於 `OpenRC`
+#### System clock update for `OpenRC` users
 
-執行
-```sh
-ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
+Execute the following command to set the system clock to your desired time zone:
+
+```bash
+ln -sf /usr/share/zoneinfo/<Your_Time_Zone> /etc/localtime
 ```
-以設定時區
 
-根據時間同步化服務按需重啓服務
+Restart your time synchronisation service if needed, `chrony` for example:
 
-例如 `chrony`
-
-```sh
+```bash
 rc-service chronyd restart
 ```
 
-## 開始 Gentoo Linux 的安裝作業
+## Get started with installing Gentoo Linux
 
-### 安裝 stage3 檔案
+### Install the stage3 tarball
 
-> stage3 檔案是 Gentoo Linux 的 “種子”，是基於某些作業系統設定檔自動構建的，幾乎包含了整個基礎作業系統的檔案。
+> stage3 tarball is a pre-compiled base system that you can use to start building your Gentoo installation, it contains the essential files and directories needed to run a basic Gentoo system.
 
-> 在選擇 stage3 檔案時，必須考慮清楚慾使用的 init 程式是 `systemd` 還是 `OpenRC`，這會省下不必要的麻煩。
+> Be cautious to download the correct stage3 tarball for your architecture and desired profile, especially for init systems.
 
-- 掛載磁碟分割
+- Mount partitions
 
-  1. 建立 `/mnt/gentoo` 資料夾
-   
-  2. 掛載作爲根目錄的磁碟分割或 btrfs 子卷至 `/mnt/gentoo` 並建立 `/mnt/gentoo/efi` `/mnt/gentoo/home` 以及其他您欲獨立掛載的掛載點
-   
-  3. 掛載所有磁碟分割或子卷
+  1. Create the mounting point in `/mnt/gentoo`
 
-- 安裝 stage3 檔案
+  2. Mount the root file system partition or subvolume to `/mnt/gentoo`, and create `/mnt/gentoo/efi` `/mnt/gentoo/home` etc. to mount other partitions.
 
-  1. 切換目錄至 `/mnt/gentoo`
-   
-  2. 使用 `links` 或 `wget` 歸檔 stage3 檔案
-   
-例如
+  3. Mount all partitions or subvolumes to their respective mount points.
 
-```sh
+- Install the stage3 tarball
+
+  1. Change your directory to `/mnt/gentoo`.
+
+  2. Download the stage3 tarball via `links` or `wget` to download it directly.
+
+For example, to download the latest stage3 tarball for amd64 architecture:
+
+```bash
 links https://mirrors.cernet.edu.cn/gentoo/releases/amd64/autobuilds/
 ```
 
-- 選擇一個資料夾
+- Navigate to choose a folder:
 
-  對於 `systemd` 請使用 `current-stage3-amd64-desktop-systemd` 中的檔案
+  For `systemd` users, you can download tarballs reside in `current-stage3-amd64-desktop-systemd`.
 
-  對於 `OpenRC` 請使用 `current-stage3-amd64-desktop-openrc` 中的檔案
+  For `OpenRC` users, you can download tarballs reside in `current-stage3-amd64-desktop-openrc`.
 
-- 歸檔完成後，請按需執行檔案校驗並解壓 stage3 檔案
+- After archiving the tarball, you can extract it by executing the following command in `/mnt/gentoo`:
 
-  於 `/mnt/gentoo` 目錄中執行
+```bash
+tar xpf stage3-amd64-desktop-<init 程式>-<時間戳>.tar.xz --xattrs-include='*.*' --numeric-owner
+```
 
-  ```sh
-  tar xpf stage3-amd64-desktop-<init 程式>-<時間戳>.tar.xz --xattrs-include='*.*' --numeric-owner
-  ```
+### Configure `portage`
 
-  以解壓縮 stage3 檔案至目標根目錄
+> `portage` is the package management system used by Gentoo Linux, the heart of Gentoo's flexibility and customisation.
 
-### 調整 `portage` 設定
+#### Manipulating `make.conf`
 
-> `portage` 是 Gentoo Linux 的包管理體系，是 Gentoo 的核心
+> Consult https://wiki.gentoo.org/wiki//etc/portage/make.conf for detailed configuration options.
 
-#### 變更 `make.conf` 設定
+By executing the following command, you can edit the `make.conf` file:
 
-> 詳情請參閲 https://wiki.gentoo.org/wiki//etc/portage/make.conf
-
-執行
-
-```sh
+```bash
 nano /mnt/gentoo/etc/portage/make.conf
 ```
 
-1. 變更編譯器設定
+1. Set compiler flags
 
-找到行
+Look for 
 
 ```
 COMMON_FLAGS="-O2 -pipe"
 ```
 
-變更爲
+and change it to:
 
 ```
 COMMON_FLAGS="-march=x86-64 -O2 -pipe"
 ```
 
-> 若您的 CPU 是 x86-64-v3 的微架構，可以考慮使用 `-march=x86-64-v3`；若支援 AVX512，可以考慮使用 `-march=x86-64-v4`
+> If your CPU support `AVX2`, you can consider using `-march=x86-64-v3`, and `AMX` or `AVX512` for `-march=x86-64-v4`.
 
-> 慾使用編譯器檢測的原生微架構，可使用 `-march=native`，此舉會讓本機編譯安裝的二進制檔案無法在別的微架構的 CPU 上如期運作
+> To use native optimisations detected by compiler, you can use `-march=native`, but this may cause compatibility issues with other systems that have different micro architecture.
 
-> 根據 Gentoo Handbook，`-O2` 是最合適的等級，`-O3` 可以稍微加快速度，但 “某些時候會出現問題”
+> According to Gentoo Handbook, `-O2` is a good balance between performance and stability, but you can experiment with other optimisation levels like `-O3` if you are comfortable with it, but Gentoo indicates that if *may cause problems*.
 
-2. 變更編譯時的執行緒數量及負載
+2. Set threads and jobs to be used by `portage`
 
-例如本機的 CPU 有 12 條執行緒，RAM 的大小也大於或等於 32 GB，則
-
-加入行
+For example, we have 12 threads and 32 GB or above of RAM available, we can set:
 
 ```
 MAKEOPTS="-j12 -l12"
 ```
 
-比較 CPU 的執行緒數量與 RAM 的一半大小，兩者中取最小值填入。
+Simply compare half the number of threads with half the size of RAM and take the smaller one.
 
-3. 調整 `portage` 進程的優先級及並行作業數量
+3. Set the priority of the `portage` process and paralled jobs
 
-加入行
+Append the following line to the `make.conf` file to set the idle scheduling policy for `portage` to avoid hogging CPU resources:
+
 ```
 PORTAGE_SCHEDULING_POLICY="idle"
 ```
 
-以規定 `portage` 自身及其建立的進程的優先級爲 idle，減少安裝程式時對電腦日常使用的影響
+and this for 4 parallel jobs:
 
-加入行
 ```
 EMERGE_DEFAULT_OPTS="--jobs 4"
 ```
 
-以規定 `portage` 最大並行作業數量爲 4
+4. Set default Gentoo repository mirrors
 
-4. 加入 Gentoo 倉庫鏡像
-
-加入行
+You can set the default Gentoo repository mirrors by appending the following line to the `make.conf` file if you are in China:
 
 ```
 GENTOO_MIRRORS="https://mirrors.tuna.tsinghua.edu.cn/gentoo"
 ```
 
-以使用清華 TUNA 鏡像伺服器
+> You can also use other mirrors like `https://mirrors.cernet.edu.cn/gentoo` or `https://mirrors.aliyun.com/gentoo` according to your location.
 
-> 鏡像可以根據地理位置調整，例如廣東省的使用者可以使用 SUSTech CRA 鏡像
->
-> ```
-> GENTOO_MIRRORS="https://mirrors.sustech.edu.cn/gentoo"
-> ```
+5. Set graphics cards
 
-5. 設定顯示卡
-   
-`portage` 會根據 `VIDEO_CARDS` 設定編譯安裝所需的包
+`portage` can automatically pull the correct drivers for your graphics card, so you can set it via `VIDEO_CARDS` variable.
 
-- 對於 4th Gen 或更新的 Intel Integrated GPU 以及 Intel ARC GPU
+- For 4th Gen and later Intel graphics, you can set:
 
   ```
   VIDEO_CARDS="intel"
   ```
 
-- 對於慾使用專有驅動程式的 NVIDIA GPU
+- For NVIDIA graphics with proprietary drivers, you can set:
 
   ```
   VIDEO_CARDS="nvidia"
   ```
 
-- 對於 Radeon Integrated GPU 和 Radeon Discrete GPU，請寫入
+- For AMD Radeon graphics, you can set:
 
   ```
   VIDEO_CARDS="amdgpu radeonsi"
   ```
 
-- 若使用的是 QEMU/KVM 虛擬機，請啓用
+- If you are using Gentoo in a QEMU/KVM client, you can set:
+
   ```
-  VIDEO_CARDS="virgl"
+  VIDEO_CARDS="virtgl"
   ```
 
-  以使用 VirtIO 的 OpenGL 加速
+Please be aware that you can set multiple values for `VIDEO_CARDS` by separating them with spaces.
 
-請根據自己的硬體配置組合使用上述例子
-
-> 例如，對於一部使用帶有 Radeon Integrated GPU 的 Ryzen CPU 和 NVIDIA Discrete GPU 的筆電，請寫入
+> Here is an example of `VIDEO_CARDS` settings:
+>
+> A laptop with Radeon Integrated GPU and NVIDIA discrete GPU, you can set:
 >
 > ```
 > VIDEO_CARDS="amdgpu radeonsi nvidia"
 > ```
 
+6. Set default USE flags
 
-6. 設定全域 `USE` 變數
-
-加入行
+Append the following line to the `make.conf` file to set default USE flags:
 
 ```
 USE=""
 ```
 
-並與引號內加入
-
-例如，本機慾使用 X Server, Wayland, KDE Plasma, Pipewire Sound Server, fcitx，並優先使用二進制分發的包，內核使用 Gentoo 發行版標準內核
-
-可以寫入
+For example, we are to use X Server, Wayland, KDE Plasma, Pipewire Sound Server, fcitx, and always use ditributed binaries and Gentoo distro kernel, we can set:
 
 ```
 USE="X wayland kde qt pipewire pulseaudio fcitx bindist dist-kernel -gnome"
 ```
 
-1. 設定所接受的“許可證”
+7. Set accepted licenses
 
-推薦對全域使用如下設定，並建立 `/etc/portage/package.license/` 資料夾，於其對某些包進行例外設定
+Recommended to set the following line for global use, and create `/etc/portage/package.license/` directory to set exceptions for certain packages:
 
 ```
 ACCEPT_LICENSE="-* @FREE @BINARY-REDISTRIBUTABLE"
 ```
 
-#### 添加 `portage` 的倉庫
+#### Configure the `portage` tree
 
-1. 建立倉庫設定檔案的資料夾
+1. Create the `/etc/portage/repos.conf` directory if it does not exist for repositories configuration:
 
-執行
-
-```sh
+```bash
 mkdir /mnt/gentoo/etc/portage/repos.conf
 ```
 
-此資料夾用於存放 gentoo 倉庫以及 `eselect` 中啓用的倉庫的設定檔案
+This directory is used to store the configuration files for different repositories, including those set by `eselect`.
 
-1. 拷貝 Gentoo Linux 官方倉庫 (gentoo) 的設定檔案
+1. Copy the default repository configuration file for the official repo (gentoo) to the `/etc/portage/repos.conf` directory:
 
-執行
-
-```sh
+```bash
 cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
 ```
 
-替換倉庫位址爲鏡像位址
+You can change the repo URL in the `gentoo.conf` file if you want to use a different mirror.
 
-使用 `nano` 編輯 `/mnt/gentoo/etc/portage/repos.conf/gentoo.conf`
-
-將行
+For example, change this line
 
 ```
 sync-uri = rsync://rsync.gentoo.org/gentoo-portage
 ```
 
-替換爲
+to 
 
 ```
 sync-uri = rsync://mirrors.cernet.edu.cn/gentoo-portage
 ```
 
-#### 添加 `portage` 二進制包倉庫
+#### Add binary packages repository for `portage`
 
-使用 `nano` 編輯 `/mnt/gentoo/etc/portage/binrepos.conf/gentoobinhost.conf` 
-
-將行
+Edit `/mnt/gentoo/etc/portage/binrepos.conf/gentoobinhost.conf` and change this line
 
 ```
 sync-uri = https://distfiles.gentoo.org/releases/amd64/binpackages/23.0/x86-64/
 ```
 
-替換爲慾使用的鏡像，例如：
+to
 
 ```
 sync-uri = http://mirrors.sustech.edu.cn/gentoo/releases/amd64/binpackages/23.0/x86-64/
 ```
 
-> 若您的 CPU 支援 x86-64-v3，可以考慮啓用，將結尾替換爲 x86-64-v3 即可
+> Again, if you have a CPU that supports `AVX2`, you can change the URL to `https://mirrors.sustech.edu.cn/gentoo/releases/amd64/binpackages/23.0/x86-64-v3/`.
 
-### 進入 Gentoo Linux 執行後續安裝及設定
+### Enter the chroot environment to continue the installation
 
-#### 使用 `chroot` 進入 Gentoo Linux
+#### `chroot` into Gentoo Linux
 
-1. 拷貝 DNS 解析檔案
+1. Copy DNS resolution information to the new environment:
 
-> 這一步至關重要，否則有可能無法存取 Internet
+> This step is necessary to ensure that the new environment can resolve domain names to access the Internet.
 
-執行
-
-```sh
+```bash
 cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 ```
 
-2. 掛載必要的檔案系統並進入 Gentoo Linux
+2. Mount necessary filesystems:
 
-- 若您使用的是 Arch Linux 及其衍生版的 Live ISO 或有 `arch-chroot` 程式，這一步非常簡單
+- If you are using Arch Linux Live ISO or its derivatives, or you have `arch-chroot` installed, you can execute the following command to mount the necessary filesystems:
 
-  執行
-
-  ```sh
+  ```bash
   arch-chroot /mnt/gentoo
   ```
 
-  隨後可以變更 Prompt 加以區分 chroot 環境
+  then you can change your shell prompt to indicate that you are in the chroot environment:
 
-  ```sh
+  ```bash
   export PS1="(chroot) ${PS1}"
   ```
 
-- 若您沒有該程式，請執行
+- If you don't have `arch-chroot` installed, you can execute the following commands to mount the necessary filesystems:
 
-  ```sh
+  ```bash
   mount --types proc /proc /mnt/gentoo/proc
   mount --rbind /sys /mnt/gentoo/sys
-  mount --make-rslave /mnt/gentoo/sys
+ mount --make-rslave /mnt/gentoo/sys
   mount --rbind /dev /mnt/gentoo/dev
   mount --make-rslave /mnt/gentoo/dev
   mount --bind /run /mnt/gentoo/run
   mount --make-slave /mnt/gentoo/run 
   ```
 
-  > 這一步非常重要，`/proc` `/sys` `/dev` `/run` 都是安裝作業系統必要的“偽檔案系統”
+  > This is essential for the chroot environment to function properly, as pseudo file systems like `/proc` `/sys` `/dev` `/run` allows the new environment to access the system's resources.
 
-  隨後，使用 `chroot` 進入 Gentoo Linux
+  Then you can enter the chroot environment by executing:
 
-  執行
-
-  ```sh
+  ```bash
   chroot /mnt/gentoo /bin/bash
   source /etc/profile
   export PS1="(chroot) ${PS1}"
   ```
 
-#### 同步化處理 `portage` 資料庫並設定二進制包認證
+#### Synchronise the `portage` tree
 
-執行
+Execute the following command to synchronise the `portage` tree to the latest version:
 
-```sh
+```bash
 emerge-webrsync
 ```
 
-以取得最新的資料庫
+Then get keyrings for binary packages:
 
-執行
-
-```sh
+```bash
 getuto
 ```
 
-以取得二進制包密鑰串
+#### Choose a profile
 
-#### 選擇本機設定檔
+> A profile is a set of default USE flags, package sets, and other configuration options that define the behaviour of the system. You can choose a profile that suits your needs.
 
-> `eselect` 的設定檔賦予 `USE` `CFLAGS` 以及其他重要變數預設值，並屏蔽了某些包及某些包的版本，這是作爲整個作業系統的基石，因此請謹慎選擇
+Execute the following command to list available profiles:
 
-執行
-
-```sh
+```bash
 eselect profile list
 ```
 
-以檢視設定檔列表，同樣，可以輸出至 `grep` 進行篩選，例如：
+> Filter the output by using `grep` to find the profile you want, for example, `eselect profile list | grep plasma`.
 
-執行
+Then execute the following command to set the desired profile:
 
-```sh
-eselect profile list | grep plasma
-```
-
-以篩選使用 KDE Plasma 桌面的設定檔
-
-> 注意：此處的設定檔必須與 stage3 檔案的一致，例如 `systemd` 與 `OpenRC` 的選擇
-
-慾選擇設定檔
-
-執行
-
-```sh
+```bash
 eselect profile set <ID>
 ```
 
-#### 設定 `CPU_FLAGS`
+#### Set `CPU_FLAGS`
 
-Gentoo Linux 提供了一個自動化的程式用於加入 CPU 支援的命令集與演算法
+Gentoo provides a tool to help you set the correct `CPU_FLAGS` for your system. 
 
-執行
-
-```sh
+```bash
 emerge --ask --oneshot app-portage/cpuid2cpuflags
 ```
 
-> 簡便表達，使用 `-a1`
+> To shorten the command, you can use `emerge -a1 cpuid2cpuflags`.
 
-> `--oneshot` 是表示不要將該包錄入 @world 集合中，因爲該程式只需要使用一次
+> `--oneshot` means that the package will not be added to the world file, and `--ask` will prompt you for confirmation before proceeding.
 
-以安裝
+Execute the following command to generate and import the `CPU_FLAGS`:
 
-再執行
-
-```sh
+```bash
 echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
 ```
 
-以匯入所有 `CPU_FLAGS`
+#### Perform a global system update (Optional)
 
-#### 更新 @world 集合中的所有包（可選步驟）
+> This step is optional, because the stage3 tarball already contains a basic system. However, if you run into trouble installing packages, you can perform a global system update.
 
-> 這一步並非必要，因爲安裝完成且進入作業系統後再更新亦無妨，若後續出現編譯或安裝問題可以返回執行這一步
+Update the system by executing the following command:
 
-執行
-
-```sh
+```bash
 emerge --ask --verbose --update --deep --newuse @world
 ```
 
-> 簡便表達，可以使用 `-avuDN`
+> To shorten the command, you can use `emerge -avuDN @world`.
 
-> 可以考慮加入 `--getbinpkg` 以使用二進制包；簡便表達爲 `-g`，也就是 `emerge -agvuDN @world`
+> Consider using `--getbinpkg` or `-g` to get binary packages, and that's `emerge -agvuDN @world`.
 
-即可
+#### Set system locale
 
-#### 設定區域格式
+> It's similar to setting the system locale in Arch Linux, but Gentoo provides a more flexible way to do it.
 
-> 這一步與手動安裝 Arch Linux 的非常相似
+Edit the `/etc/locale.gen` file to uncomment or append your desired locale(s).
 
-使用 `nano` 於 `/etc/locale.gen` 反註釋或手動寫入 locale
+Execute the following command to generate the locale(s):
 
-執行
-
-```sh
+```bash 
 locale-gen
 ```
 
-以生成區域格式
+List the default locale by executing the following command:
 
-執行
-
-```sh
+```bash
 eselect locale list
 ```
 
-以檢視區域格式列表
+Then set the default locale by executing the following command:
 
-使用
-
-```sh
+```bash
 eselect locale set <ID>
 ```
 
-以設定全域區域格式
+Finally, you can update current environment by executing:
 
-最後執行
-
-```sh
+```bash
 env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 ```
 
-以套用區域格式變更
+#### Set system time zone
 
-#### 設定時區
+> It's also familiar to setting the system time zone in Arch Linux.
 
-> 這一步也與手動安裝 Arch Linux 的非常相似
+Execute the following command to set the system time zone:
 
-執行
-
-```sh
+```bash
 ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
 ```
 
-#### 安裝 Linux 內核及韌體
+#### Install the Gentoo Linux distro kernel and firmware
 
-- 以將 `systemd` 作爲 init 程式並使用 `systemd-boot` 啓動 `dracut` 建立的 `gentoo-kernel-bin` 的 Unified Kernel Image (UKI) 爲例
+- Take a system with `systemd` init that boots from a Unified Kernel Image (UKI) of `gentoo-kernel-bin` created by `dracut` with `systemd-boot` as an example:
 
-  1. 加入 `installkernel` 包對 `dracut` `systemd-boot` 以及 UKI 的支援
-   
-   執行
+  1. Add support for `dracut`, `systemd-boot` and UKI to `installkernel`:
 
-   ```sh
-   nano /etc/portage/package.use/installkernel
-   ```
+     Create a file named `/etc/portage/package.use/installkernel` if it does not exist:
 
-   並寫入
+     ```bash
+     nano /etc/portage/package.use/installkernel
+     ```
 
-   ```
-   sys-kernel/installkernel dracut uki systemd-boot systemd
-   ```
-
-  2. 加入 `systemd` 包的 `systemd-boot` 支援
-
-   執行
-
-   ```sh
-   nano /etc/portage/package.use/systemd
-   ```
-
-   並寫入
-
-   ```
-   sys-apps/systemd boot
-   ```
-
-  3. 安裝 Linux 韌體及內核
-   
-   執行
-
-   ```sh
-   emerge -a linux-firmware gentoo-kernel-bin intel-microcode
-   ```
-
-   > 使用 `gentoo-kernel-bin` 是爲了節省安裝的時間，對於 Intel CPU ，必須於此安裝 `intel-microcode`，AMD CPU 的微碼已包含於 `linux-firmware` 中
-
-  4. 變更 `dracut` 設定
-   
-   使用 `nano` 編輯 `/etc/dracut.conf`
-
-   寫入
-
-   ```
-   uefi="yes"    # 支援 UEFI 啓動，UKI 必須啓用
-   hostonly="yes"    # 建立適用於本機的精簡 initramfs，節約磁碟空間
-   kernel_cmdline="所需執行的命令"    # 一般而言需要指定根目錄所在分割及其挂載選項
-   ```
-
-   > 同樣的，`dracut` 也支援分類管理配置檔案，建立 `/etc/dracut.conf.d/` 資料夾並於此加入配置檔案
-
-   > 對於一個使用 btrfs 檔案系統的計算機而言， `kernel_cmdline` 通常包括
-   >
-   > `root=UUID=<分割的UUID>`
-   >
-   > `rootflags=subvol=<根目錄所在子卷>`
-   >
-   > `rootfstype=btrfs`
-   >
-   > `rw`
-   >
-   > 填入時請以逗號分隔
-
-   **請注意，根目錄位於 LVM 邏輯卷中的讀者請不要在 KERNEL_CMDLINE 使用 UUID 指定根目錄**
-
-   **可以使用 `root=/dev/mapper/<VG 名稱>-<LV 名稱>`**
-
-- 以將 `OpenRC` 作爲 init 程式並使用 `systemd-boot` 啓動 `dracut` 建立的 `gentoo-kernel-bin` 的 Unified Kernel Image 爲例
-
-  > 上述的第二步需要注意
-
-  2. 加入 `sys-apps/systemd-utils` 的 `systemd-boot`, `udev` 以及 `kernel-install` 支援
+     Append the following line to the file:
     
-    執行
-    ```sh
-    nano /etc/portage/package.use/systemd-utils
-    ```
+     ```
+     sys-kernel/installkernel dracut uki systemd-boot systemd
+     ```
 
-    寫入
+  2. Add support for `systemd-boot` to `systemd`:
 
-    ```
-    sys-apps/systemd-utils boot kernel-install udev
-    ```
+     Create a file named `/etc/portage/package.use/systemd` if it does not exist:
 
-#### 撰寫 `/etc/fstab`
+     ```bash
+     nano /etc/portage/package.use/systemd
+     ```
 
-- 若使用的是 Arch Linux 及其衍生版的 Live ISO，這一步也非常簡單
+     Append the following line to the file:
 
-  於 Live ISO 環境中以 root 登入
+     ```
+     sys-apps/systemd boot
+     ```
 
-  執行
+  3. Install kernel and firmware:
 
-  ```sh
-  genfstab -U /mnt/gentoo > /mnt/gentoo/etc/fstab
-  ```
+     Execute the following command to install the kernel and firmware:
 
-  回到 chroot 環境使用 `nano` 按需求修改 `/etc/fstab` 以變更掛載設定
+     ```bash
+     emerge -a gentoo-kernel-bin linux-firmware
+     ```
 
-- 若使用的 Live ISO 沒有 `genfstab`
+     > Use `gentoo-kernel-bin` to install the latest stable pre-compiled kernel to shorten time. 
 
-  使用 `nano` 撰寫 `/etc/fstab`
+     > Be sure to install `intel-microcode` if you have an Intel CPU, while AMD's is included in `linux-firmware`.
 
-  > 一個以 `/efi` 爲 EFI 分割，`/` 使用 btrfs 且獨立 `/home` 使用 f2fs 的設定應該是這樣的
+  4. Change `dracut` configuration:
+
+        Edit the `/etc/dracut.conf` file to configure
+    
+        ```bash
+        nano /etc/dracut.conf
+        ```
+    
+        Append the following lines to the file:
+
+        ```
+        uefi="yes"  # To support UEFI booting, necessary for UKIs
+        hostonly="yes"  # To create a minimal initramfs without unnecessary modules
+        kernel_cmdline="<command line options>"  # Typically specifies root block device and file system type
+        ```
+
+        > Alternatively, you can use snippet files in `/etc/dracut.conf.d/` to configure `dracut`.
+
+        > For a system with btrfs, you can set the `kernel_cmdline` to:
+        >
+        > `root=UUID=<your-root-uuid>`
+        >
+        > `rootflags=subvol=<your-subvolume>`
+        >
+        > `rootfstype=btrfs`
+        >
+        > `rw`
+        >
+        > Seperate them with spaces, and replace `<your-root-uuid>` and `<your-subvolume>` with your actual root UUID and subvolume name.
+
+        **Be aware that DO NOT USE UUID to specify your root device if resides in a LVM logical volume**
+
+        **It's applicable to use `root=/dev/mapper/<your-vg-name>/<your-lv-name>`**
+
+- For a system with `OpenRC` init that boots from a Unified Kernel Image (UKI) of `gentoo-kernel-bin` created by `dracut` with `systemd-boot` as the bootloader:
+
+  > Step 2 above needs your attention
+
+  2. Add support for `systemd-boot` `udev` `kernel-install` to `sys-apps/systemd-utils`:
+
+     Create a file named `/etc/portage/package.use/systemd-utils` if it does not exist:
+
+     ```bash
+     nano /etc/portage/package.use/systemd-utils
+     ```
+
+     Append the following line to the file:
+
+     ```
+     sys-apps/systemd-utils boot kernel-install udev
+     ```
+
+#### Alternate your `/etc/fstab`
+
+- If you are using Arch Linux Live ISO or its derivatives, you can execute the following command to generate a default `/etc/fstab` file:
+
+```bash
+genfstab -U /mnt/gentoo > /mnt/gentoo/etc/fstab
+```
+
+Then back to the chroot environment to manipulate the `/etc/fstab` file as needed.
+
+- If you don't have `genfstab` installed, you can create the `/etc/fstab` file manually:
+
+> A system with its ESP mounted to `/efi` and a btrfs root file system and a seperate `/home` with f2fs should be like this:
 
   | UUID | Mount point | Filesystem type | Options | Dump | Filesystem check |
   | - | - | - | - | - | - |
-  | UUID=<分割UUID> | / | btrfs | defaults,subvol=<根目錄所在子卷> | 0 | 1 |
-  | UUID=<分割UUID> | /var/log | btrfs | defaults,subvol=<日誌目錄所在子卷> | 0 | 2 |
-  | UUID=<分割UUID> | /efi | vfat | defaults | 0 | 2 |
-  | UUID=<分割UUID> | /home | f2fs | defaults | 0 | 2 |
+  | UUID=<your-root-UUID> | / | btrfs | defaults,subvol=<your-root-subvolume> | 0 | 1 |
+  | UUID=<your-root-UUID> | /var/log | btrfs | defaults,subvol=<your-log-subvolume> | 0 | 2 |
+  | UUID=<your-esp-UUID> | /efi | vfat | defaults | 0 | 2 |
+  | UUID=<your-home-UUID> | /home | f2fs | defaults | 0 | 2 |
 
-  **請注意，使用 LVM 的讀者請不要在 `/etc/fstab` 使用 UUID 指派挂載點**
+  **Please note that DO NOT specify mounting points for LVM logical volumes with UUID**
 
-  **可以使用 `/dev/mapper/<VG 名稱>-<LV 名稱>`**
+  **Instead, use `/dev/mapper/<your-vg-name>-<your-lv-name>`**
 
-#### 設定 root 密碼及加入使用者賬戶
+#### Set the root password and add a user
 
-1. 設定密碼及加入使用者賬戶
+1. Set the root password by executing the following command as root:
 
-執行
-
-```sh
+```bash
 passwd
 ```
 
-以設定 root 密碼
+Execute the command to add a user and append the user to the `wheel` privileged group:
 
-再執行
-
-```sh
-useradd -m -G wheel <使用者名稱>
+```bash
+useradd -m -G wheel <username>
 ```
 
-以加入使用者賬戶並將其加入 wheel 特權組
+Set the password for the user by executing the following command:
 
-執行
-
-```sh
-passwd <使用者名稱>
+```bash
+passwd <username>
 ```
 
-以設定使用者密碼
+2. Configure `sudo` to allow the user to execute commands as root:
 
-2. 設定 `sudo`
-   
-執行
+Execute the following command to install `sudo`:
 
-```sh
+```bash
 emerge -a sudo
 ```
 
-以安裝 `sudo`
+Edit the `/etc/sudoers` file and append user name.
 
-使用 `nano` 編輯 `/etc/sudoers` 以允許使用者使用 `sudo`
+#### Setup your init
 
-#### 設定 init 程式
+- For `systemd` users:
 
-- 對於 `systemd`
+  Execute the following command and follow the prompt to perform the initial setup:
 
-  執行
-
-  ```sh
+  ```bash
   systemd-machine-id-setup
   systemd-firstboot --prompt
   ```
 
-  並按提示進行設定
+  Load preset configurations for all systemd services:
 
-  ```sh
+  ```bash
   systemctl preset-all --preset-mode=enable-only
   systemctl preset-all
   ```
 
-  以載入所有服務的預設設定
+- For `OpenRC` users:
 
-- 對於 `OpenRC`
+  Create `/etc/hostname` file and set your hostname
 
-  建立 `/etc/hostname` 並寫入主機名
+  Configure as needed in `/etc/rc.conf` `/etc/conf.d/keymaps` `/etc/conf.d/hwclock`
 
-  請分別閱讀並按需修改 `/etc/rc.conf` `/etc/conf.d/keymaps` `/etc/conf.d/hwclock`
+  > It's recommended to set `rc_logger="YES"` in `/etc/rc.conf`.
 
-  > 建議於 `/etc/rc.conf` 中啓用 `rc_logger="YES"`
+#### Configure network interfaces
 
-#### 設定網路介面卡
+> We'll use `networkmanager` to manage network interfaces, which is a user-friendly tool for network configuration.
 
-> 以使用 `networkmanager` 爲例
+Execute the following command to install `networkmanager`:
 
-執行
-
-```sh
+```bash
 emerge -ag networkmanager
 ```
 
-> `-a` 即 `--ask`，要求二次確認；`-g` 即 `-getbinpkg`，優先使用二進制包
+Then enable its service to start at boot:
 
-再啓用服務以開機載入
+- For `systemd` users:
 
-- 對於 `systemd`
-
-  ```sh
+  ```bash
   systemctl enable NetworkManager
   ```
 
-- 對於 `OpenRC`
+- For `OpenRC` users:
 
-  ```sh
+  ```bash
   rc-update add NetworkManager default
   ```
 
-#### 安裝作業系統工具
+#### Install utilities
 
-1. 磁碟排程效能優化
+1. Disk scheduling optimisation
+
+   Install `io-scheduler-udev-rules`
+
+2. File indexing
+
+   Install `mlocate`
+
+3. Command completion for `bash`
+
+   Install `bash-completion`
+
+4. File system utilities
+
+   Install what you need
+
+   > For instance, `btrfs-progs` for btrfs file system, `f2fs-tools` for f2fs file system, `dosfstools` for FAT32 file system, and `lvm2[lvm]` for LVM, etc.
    
-   安裝 `io-scheduler-udev-rules`
+5. WLAN utilities
 
-2. 檔案索引
-   
-   安裝 `mlocate`
+   Install `wpa_supplicant` and `iw` for wireless network management.
 
-3. `bash` 命令補全
+   > For better compatibility, you can install `wpa_supplicant` with `tkip` USE flag enabled.
 
-   安裝 `bash-completion`
+- For `OpenRC` users, you will need the following tools:
 
-4. 檔案系統工具
-
-   根據所使用的檔案系統安裝
-
-   > 例如，本機使用的是 btrfs, f2fs, FAT32 以及 LVM
-
-   > 則應安裝 `btrfs-progs` `f2fs-tools` `dosfstools` `lvm2[lvm]`
-
-5. WLAN 工具
-   
-   安裝 `iw` `wpa_supplicant`
-
-   > 爲了更好的相容性，`net-wireless/wpa_supplicant` 還可以加入 `tkip` USE Flag
-
-- 對於 `OpenRC` init，還需要安裝如下工具
-  
   `app-admin/sysklogd`
   `sys-process/cronie`
   `net-misc/chrony`
 
-  並分別啓用服務
+  Enable them respectively:
 
-  ```sh
+  ```bash
   rc-update add sysklogd default
   rc-update add cronie default 
   rc-update add chronyd default
   ```
 
-#### 安裝啓動載入器
+#### Install the bootloader
 
-> 以使用 `systemd-boot` 爲例
+> We are to use `system-boot` as the bootloader.
 
-執行
+Execute the following command to install `system-boot`:
 
-```sh
+```bash
 bootctl install
 ```
 
-隨後執行
+To check if the installation is successful and your boot entries, you can execute:
 
-```sh
+```bash
 bootctl list
 ```
 
-檢查啓動項目
+#### Reboot into your new Gentoo Linux installation
 
-> 注意：若使用了 LVM，則應該爲包 `sys-fs/lvm2` 加入 `lvm` 的 USE Flag，並在 `dracut` 中要求加入 `lvm` 模塊
+Exit the chroot environment by executing `exit` or pressing `Ctrl+D`.
 
-> 使用 `nano` 編輯 `/etc/dracut.conf`
->
-> 加入
->
-> ```
-> add_dracutmodules+=" lvm "
-> ```
->
-> 執行
->
-> ```sh
-> emerge -a --config <所安裝的內核包>
-> ```
->
-> 以重新建立 initramfs
+Back to the Live ISO environment, unmount the mounted filesystems:
 
-> 最後，執行 `bootctl list` 檢查啓動項目
-
-#### 重新開機進入 Gentoo Linux
-
-於 chroot 環境中執行 `exit` 或同時按下 `Control` 和 `D`
-
-返回 Live ISO 環境後執行
-
-```sh
+```bash
 cd
-umount -Rl /mnt/gentoo/
+umount -Rl /mnt/gentoo
 ```
 
-以取消挂載新系統的分割區
+Then reboot your system and choose Linux Boot Manager or UEFI OS from the boot menu to enter `systemd-boot` and boot into your new Gentoo Linux installation.
 
-現在，重啓計算機並於開機選單中選擇 Linux Boot Manager 或 UEFI OS 以進入 `systemd-boot` 以啓動 Gentoo Linux
+### Setup GUI for your new Gentoo Linux installation
 
-### 設定 Gentoo Linux 的 GUI
+> We will use KDE Plasma as an example, but you can choose any desktop environment you prefer.
 
-> 以 KDE Plasma 爲例
+- Install X Server and NVIDIA Proprietary drivers:
 
-- 安裝 X Server 以及 NVIDIA GPU 驅動程式
-
-  執行
-
-  ```sh
-  emerge -ag xorg-server nvidia-drivers
+  ```bash 
+  emerge -a xorg-server nvidia-drivers
   ```
 
-  > 請注意，若您使用的是 NVIDIA GPU 作爲唯一視訊輸出 GPU，請加入該配置檔案
-  >
-  > `/etc/X11/xorg.conf.d/nvidia.conf`
-  >
+  > ATTENTION: If your NVIDIA GPU is the only GPU to output video, please add this configuration to `/etc/X11/xorg.conf.d/nvidia.conf`:
+
   >  ```
   >  Section "Device"
   >     Identifier  "nvidia"
@@ -889,76 +785,64 @@ umount -Rl /mnt/gentoo/
   >  EndSection
   >  ```
 
+- Install KDE Plasma:
 
-- 安裝 KDE Plasma
-  
-  執行
-
-  ```sh
+  ```bash
   emerge -ag plasma-meta sddm kde-apps/dolphin ark konsole
   ```
 
-- 啓用 SDDM 登入
+- Enable SDDM to start at boot:
 
-  - 對於 `systemd`
+  - For `systemd` users:
 
-  執行
+    ```bash
+    systemctl enable sddm
+    ```
 
-  ```sh
-  systemctl enable sddm
+  - For `OpenRC` users:
+
+    Edit `/etc/conf.d/display-manager` to specify SDDM
+
+    ```
+    ......
+    DISPLAYMANAGER="sddm"
+    ```
+
+    Then enable `display-manager` and `elogind` to start at boot:
+
+    ```bash
+    rc-update add display-manager default
+    rc-update add elogind boot
+    ```
+
+- Enable Pipewire sound server:
+
+  Append a user to the `pipewire` group:
+
+  ```bash
+  usermod -aG pipewire <username>
   ```
 
-  - 對於 `OpenRC`
+  - For `systemd` users, execute the following command as a regular user:
+
+    ```bash
+    systemctl --user enable pipewire
+    systemctl --user enable pipewire-pulse
+    systemctl --user enable wireplumber
+    ```
   
-  修改 `/etc/conf.d/display-manager` 並指定 SDDM
+  - For `OpenRC` users, please double-check if there is a `/bin/gentoo-pipewire-launcher` exist.
 
-  ```
-  ......
+    For desktop environments that honour auto-start files, such as KDE Plasma, you don't need any extra steps.
 
-  DISPLAYMANAGER="sddm"
-  ```
+    For others, please refer to https://wiki.gentoo.org/wiki/PipeWire#OpenRC
 
-  啓用 `display-manager` `elogind` 服務
+- Allow a user to use removable media and graphics hardware acceleration:
 
-  ```sh
-  rc-update add display-manager default
-  rc-update add elogind boot
-  ```
-
-- 啓用 Pipewire 音訊
-
-  將使用者加入 `pipewire` 組
-
-  ```sh
-  usermod -aG pipewire <使用者名稱>
-  ```
-
-  - 對於 `systemd`
-
-  以使用者權限執行
-
-  ```sh
-  systemctl --user enable pipewire
-  systemctl --user enable pipewire-pulse
-  systemctl --user enable wireplumber
-  ```
-
-  - 對於 `OpenRC`
-  
-  > 請檢查 `/bin/gentoo-pipewire-launcher` 是否已存在
-
-  對於支援自動啓動的桌面環境，如 KDE Plasma，不需要額外操作
-
-  其他桌面環境請參閱 https://wiki.gentoo.org/wiki/PipeWire#OpenRC
-
-- 允許使用者使用可移動裝置以及圖形硬體加速
-
-  執行
-
-  ```sh
-  usermod -aG plugdev <使用者名稱>
-  usermod -aG video <使用者名稱>
+  ```bash
+  usermod -aG plugdev <username>
+  usermod -aG video <username>
   ```
 
 
-**至此，您已完成 Gentoo Linux 的基本安裝作業**
+**Now, you have accomplished the basic installation of Gentoo Linux**
