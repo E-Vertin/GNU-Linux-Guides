@@ -214,7 +214,7 @@ MAKEOPTS="-j12 -l12"
 
 Simply compare half the number of threads with half the size of RAM and take the smaller one.
 
-3. Set the priority of the `portage` process and paralled jobs
+3. Set the priority of `portage` and its sub-processes and paralled jobs
 
 Append the following line to the `make.conf` file to set the idle scheduling policy for `portage` to avoid hogging CPU resources:
 
@@ -228,7 +228,7 @@ and this for 4 parallel jobs:
 EMERGE_DEFAULT_OPTS="--jobs 4"
 ```
 
-4. Set default Gentoo repository mirrors
+4. Set default Gentoo distributed files mirrors
 
 You can set the default Gentoo repository mirrors by appending the following line to the `make.conf` file if you are in China:
 
@@ -375,7 +375,7 @@ cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
   ```bash
   mount --types proc /proc /mnt/gentoo/proc
   mount --rbind /sys /mnt/gentoo/sys
- mount --make-rslave /mnt/gentoo/sys
+  mount --make-rslave /mnt/gentoo/sys
   mount --rbind /dev /mnt/gentoo/dev
   mount --make-rslave /mnt/gentoo/dev
   mount --bind /run /mnt/gentoo/run
