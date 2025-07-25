@@ -167,7 +167,7 @@ links https://mirrors.cernet.edu.cn/gentoo/releases/amd64/autobuilds/
 - After archiving the tarball, you can extract it by executing the following command in `/mnt/gentoo`:
 
 ```bash
-tar xpf stage3-amd64-desktop-<init 程式>-<時間戳>.tar.xz --xattrs-include='*.*' --numeric-owner
+tar xpf stage3-amd64-desktop-<init>-<timestamp>.tar.xz --xattrs-include='*.*' --numeric-owner
 ```
 
 ### Configure `portage`
