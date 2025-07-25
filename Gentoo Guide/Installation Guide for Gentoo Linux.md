@@ -1,10 +1,10 @@
 # Installation Guide for Gentoo Linux
 
-> This passage only applies to users who have experience using GNU/Linux and are moving forward to perform a simple installation of Gentoo Linux, so articulation limited.
+> This guide is intended for users who already have experience with GNU/Linux and wish to perform a straightforward installation of Gentoo Linux. Therefore, explanations are kept concise.
 
-> Anyway, "copy - paste - run" is not my intention to compile this article, but to give readers a glimpse to the installing procedure of Gentoo Linux thus they can apply what they have learned here to other desktop environment and file system table configurations.
+> The purpose of this article is not to encourage "copy-paste-run" installation, but to provide readers with an overview of the Gentoo Linux installation procedure, so they can apply what they learn here to other desktop environments and file system configurations.
 
-> Gentoo Linux is based on source code, so it's compatible the most hardware as long as they can execute a C/C++ toolchain. Here we'll take amd64 (x86_64) with UEFI BIOS as an example.
+> Gentoo Linux is source-based, making it compatible with most hardware as long as it can run a C/C++ toolchain. This guide uses amd64 (x86_64) with UEFI BIOS as an example.
 
 ## 1. Archive and burn the installation media
 
@@ -20,7 +20,7 @@ Burn the ISO image to a USB flash drive or DVD. If you are using a USB flash dri
 
 ## 3. Prepare for installation
 
-### Prepare you disk
+### Prepare your disk
 
 #### Alternate your disk partition table
 
@@ -30,7 +30,7 @@ You should have at least two partitions: one for the root filesystem and one for
 
 > To make `/home` `/usr` `/opt` independent partitions, you can create additional partitions as needed.
 
-> Consider using subvolumes with btrfs is you are to create storage pools across multiple disks.
+> Consider using subvolumes with btrfs if you want to create storage pools across multiple disks.
 
 - EFI System Partition (ESP) will need at least 500 MB
 
@@ -40,18 +40,18 @@ You should have at least two partitions: one for the root filesystem and one for
 
   | Mount Point | Pros | Cons |
   |-------------|------|------|
-  | `/boot` | Executable EFI images and kernel images reside in the same partion for compatibility and convenient maintainance | May interfere with other GNU/Linux installations, especially if they use different bootloaders and takes more space on disk |
-  | `/efi` | Seperate kernel images and files crutial for UEFI booting, avoiding interference with other GNU/Linux installations | *It just works* |
+  | `/boot` | Executable EFI images and kernel images reside in the same partition for compatibility and convenient maintenance | May interfere with other GNU/Linux installations, especially if they use different bootloaders and takes more space on disk |
+  | `/efi` | Separate kernel images and files crucial for UEFI booting, avoiding interference with other GNU/Linux installations | *It just works* |
 
-  > According to [Gentoo Wiki](https://wiki.gentoo.org/wiki/EFI_System_Partition#Optional:_autofs), it's not recommended to mount your ESP to `/boot/efi`.
+  > According to [Gentoo Wiki](https://wiki.gentoo.org/wiki/EFI_System_Partition#Optional:_autofs), it is not recommended to mount your ESP to `/boot/efi`.
 
-  > If you are to create different ESPs for different operating systems, you can do both as illustrated above.
+  > If you want to create different ESPs for different operating systems, you can do so as illustrated above.
 
 - Root file system partition can be adjusted according to your needs, but at least 40 GB is recommended.
 
 - Create `swap` according to your needs, but at least 2 GB is recommended. If you have enough RAM (64 GB and above), you can skip this step.
 
-  Recommendations in the Gentoo Handbook:
+  Recommendations from the Gentoo Handbook:
 
   | RAM size | With suspend support | With hibernation support |
   | - | - | - |
@@ -66,11 +66,11 @@ You should have at least two partitions: one for the root filesystem and one for
 
 - For root file system, it's recommended to use btrfs and seperate `/var/log` as an independent subvolume.
   
-  To spilt up further, you can create subvolumes for `/var/cache` and `/var/tmp` as well, where Gentoo portage stores its temporary files and cache.
+  To split up further, you can create subvolumes for `/var/cache` and `/var/tmp` as well, where Gentoo portage stores its temporary files and cache.
 
   > If you have enough RAM, you can use tmpfs for `/var/tmp/portage` to speed up the installation process.
   >
-  > Append the following line to `/etc/fstab` to mount it automatically:
+  > Add the following line to `/etc/fstab` to mount it automatically:
   >
   > ```
   > tmpfs   /var/tmp/portage    tmpfs   size=<insert value>G,uid=portage,gid=portage,mode=775    0 0
@@ -80,7 +80,7 @@ You should have at least two partitions: one for the root filesystem and one for
 
 ### Connect to Internet and update the system clock
 
-This is for archiving and extracting the stage3 tarball.
+This is for downloading and extracting the stage3 tarball.
 
 #### System clock update for `systemd` users
 
@@ -90,7 +90,7 @@ Execute the following command to check the system clock:
 timedatectl status
 ```
 
-Execute the following command to set the system clock to list supported time zones:
+Execute the following command to list supported time zones:
 
 ```bash
 timedatectl list-timezones
@@ -178,7 +178,8 @@ tar xpf stage3-amd64-desktop-<init 程式>-<時間戳>.tar.xz --xattrs-include='
 
 > Consult https://wiki.gentoo.org/wiki//etc/portage/make.conf for detailed configuration options.
 
-By executing the following command, you can edit the `make.conf` file:
+
+Edit the `make.conf` file by executing the following command:
 
 ```bash
 nano /mnt/gentoo/etc/portage/make.conf
@@ -186,7 +187,7 @@ nano /mnt/gentoo/etc/portage/make.conf
 
 1. Set compiler flags
 
-Look for 
+Look for:
 
 ```
 COMMON_FLAGS="-O2 -pipe"
@@ -198,49 +199,53 @@ and change it to:
 COMMON_FLAGS="-march=x86-64 -O2 -pipe"
 ```
 
-> If your CPU support `AVX2`, you can consider using `-march=x86-64-v3`, and `AMX` or `AVX512` for `-march=x86-64-v4`.
+> If your CPU supports `AVX2`, you can consider using `-march=x86-64-v3`, and `AMX` or `AVX512` for `-march=x86-64-v4`.
 
-> To use native optimisations detected by compiler, you can use `-march=native`, but this may cause compatibility issues with other systems that have different micro architecture.
+> To use native optimizations detected by the compiler, you can use `-march=native`, but this may cause compatibility issues with other systems that have different microarchitectures.
 
-> According to Gentoo Handbook, `-O2` is a good balance between performance and stability, but you can experiment with other optimisation levels like `-O3` if you are comfortable with it, but Gentoo indicates that if *may cause problems*.
+> According to the Gentoo Handbook, `-O2` is a good balance between performance and stability, but you can experiment with other optimization levels like `-O3` if you are comfortable with it. However, Gentoo indicates that it *may cause problems*.
+
 
 2. Set threads and jobs to be used by `portage`
 
-For example, we have 12 threads and 32 GB or above of RAM available, we can set:
+For example, if you have 12 threads and 32 GB or more of RAM available, you can set:
 
 ```
 MAKEOPTS="-j12 -l12"
 ```
 
-Simply compare half the number of threads with half the size of RAM and take the smaller one.
+Simply compare half the number of threads with half the size of RAM (in GB) and use the smaller value.
 
-3. Set the priority of `portage` and its sub-processes and paralled jobs
 
-Append the following line to the `make.conf` file to set the idle scheduling policy for `portage` to avoid hogging CPU resources:
+3. Set the priority of `portage` and its subprocesses and parallel jobs
+
+Add the following line to the `make.conf` file to set the idle scheduling policy for `portage` to avoid hogging CPU resources:
 
 ```
 PORTAGE_SCHEDULING_POLICY="idle"
 ```
 
-and this for 4 parallel jobs:
+And this for 4 parallel jobs:
 
 ```
 EMERGE_DEFAULT_OPTS="--jobs 4"
 ```
 
-4. Set default Gentoo distributed files mirrors
 
-You can set the default Gentoo repository mirrors by appending the following line to the `make.conf` file if you are in China:
+4. Set default Gentoo mirror
+
+You can set the default Gentoo repository mirror by adding the following line to the `make.conf` file if you are in China:
 
 ```
 GENTOO_MIRRORS="https://mirrors.tuna.tsinghua.edu.cn/gentoo"
 ```
 
-> You can also use other mirrors like `https://mirrors.cernet.edu.cn/gentoo` or `https://mirrors.aliyun.com/gentoo` according to your location.
+> You can also use other mirrors like `https://mirrors.cernet.edu.cn/gentoo` or `https://mirrors.aliyun.com/gentoo` depending on your location.
 
-5. Set graphics cards
 
-`portage` can automatically pull the correct drivers for your graphics card, so you can set it via `VIDEO_CARDS` variable.
+5. Set graphics card
+
+`portage` can automatically pull the correct drivers for your graphics card, so you can set it via the `VIDEO_CARDS` variable.
 
 - For 4th Gen and later Intel graphics, you can set:
 
@@ -266,33 +271,37 @@ GENTOO_MIRRORS="https://mirrors.tuna.tsinghua.edu.cn/gentoo"
   VIDEO_CARDS="virtgl"
   ```
 
-Please be aware that you can set multiple values for `VIDEO_CARDS` by separating them with spaces.
+
+Please note that you can set multiple values for `VIDEO_CARDS` by separating them with spaces.
 
 > Here is an example of `VIDEO_CARDS` settings:
 >
-> A laptop with Radeon Integrated GPU and NVIDIA discrete GPU, you can set:
+> For a laptop with a Radeon integrated GPU and an NVIDIA discrete GPU, you can set:
 >
 > ```
 > VIDEO_CARDS="amdgpu radeonsi nvidia"
 > ```
 
+
 6. Set default USE flags
 
-Append the following line to the `make.conf` file to set default USE flags:
+Add the following line to the `make.conf` file to set default USE flags:
 
 ```
 USE=""
 ```
 
-For example, we are to use X Server, Wayland, KDE Plasma, Pipewire Sound Server, fcitx, and always use ditributed binaries and Gentoo distro kernel, we can set:
+
+For example, if you want to use X Server, Wayland, KDE Plasma, Pipewire Sound Server, fcitx, and always use distributed binaries and the Gentoo distro kernel, you can set:
 
 ```
 USE="X wayland kde qt pipewire pulseaudio fcitx bindist dist-kernel -gnome"
 ```
 
+
 7. Set accepted licenses
 
-Recommended to set the following line for global use, and create `/etc/portage/package.license/` directory to set exceptions for certain packages:
+It is recommended to set the following line for global use, and create the `/etc/portage/package.license/` directory to set exceptions for certain packages:
 
 ```
 ACCEPT_LICENSE="-* @FREE @BINARY-REDISTRIBUTABLE"
@@ -314,6 +323,7 @@ This directory is used to store the configuration files for different repositori
 cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
 ```
 
+
 You can change the repo URL in the `gentoo.conf` file if you want to use a different mirror.
 
 For example, change this line
@@ -330,7 +340,8 @@ sync-uri = rsync://mirrors.cernet.edu.cn/gentoo-portage
 
 #### Add binary packages repository for `portage`
 
-Edit `/mnt/gentoo/etc/portage/binrepos.conf/gentoobinhost.conf` and change this line
+
+Edit `/mnt/gentoo/etc/portage/binrepos.conf/gentoobinhost.conf` and change this line:
 
 ```
 sync-uri = https://distfiles.gentoo.org/releases/amd64/binpackages/23.0/x86-64/
@@ -382,7 +393,7 @@ cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
   mount --make-slave /mnt/gentoo/run 
   ```
 
-  > This is essential for the chroot environment to function properly, as pseudo file systems like `/proc` `/sys` `/dev` `/run` allows the new environment to access the system's resources.
+  > This is essential for the chroot environment to function properly, as pseudo file systems like `/proc`, `/sys`, `/dev`, and `/run` allow the new environment to access the system's resources.
 
   Then you can enter the chroot environment by executing:
 
@@ -416,7 +427,7 @@ Execute the following command to list available profiles:
 eselect profile list
 ```
 
-> Filter the output by using `grep` to find the profile you want, for example, `eselect profile list | grep plasma`.
+> Filter the output by using `grep` to find the profile you want, for example: `eselect profile list | grep plasma`.
 
 Then execute the following command to set the desired profile:
 
@@ -432,9 +443,12 @@ Gentoo provides a tool to help you set the correct `CPU_FLAGS` for your system.
 emerge --ask --oneshot app-portage/cpuid2cpuflags
 ```
 
+
 > To shorten the command, you can use `emerge -a1 cpuid2cpuflags`.
 
+
 > `--oneshot` means that the package will not be added to the world file, and `--ask` will prompt you for confirmation before proceeding.
+
 
 Execute the following command to generate and import the `CPU_FLAGS`:
 
@@ -454,13 +468,14 @@ emerge --ask --verbose --update --deep --newuse @world
 
 > To shorten the command, you can use `emerge -avuDN @world`.
 
-> Consider using `--getbinpkg` or `-g` to get binary packages, and that's `emerge -agvuDN @world`.
+> Consider using `--getbinpkg` or `-g` to get binary packages, i.e., `emerge -agvuDN @world`.
 
 #### Set system locale
 
-> It's similar to setting the system locale in Arch Linux, but Gentoo provides a more flexible way to do it.
+> This is similar to setting the system locale in Arch Linux, but Gentoo provides a more flexible way to do it.
 
-Edit the `/etc/locale.gen` file to uncomment or append your desired locale(s).
+
+Edit the `/etc/locale.gen` file to uncomment or add your desired locale(s).
 
 Execute the following command to generate the locale(s):
 
@@ -468,11 +483,13 @@ Execute the following command to generate the locale(s):
 locale-gen
 ```
 
-List the default locale by executing the following command:
+
+List the available locales by executing the following command:
 
 ```bash
 eselect locale list
 ```
+
 
 Then set the default locale by executing the following command:
 
@@ -480,7 +497,8 @@ Then set the default locale by executing the following command:
 eselect locale set <ID>
 ```
 
-Finally, you can update current environment by executing:
+
+Finally, you can update the current environment by executing:
 
 ```bash
 env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
@@ -488,7 +506,7 @@ env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 
 #### Set system time zone
 
-> It's also familiar to setting the system time zone in Arch Linux.
+> This is also similar to setting the system time zone in Arch Linux.
 
 Execute the following command to set the system time zone:
 
@@ -536,7 +554,7 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
      emerge -a gentoo-kernel-bin linux-firmware
      ```
 
-     > Use `gentoo-kernel-bin` to install the latest stable pre-compiled kernel to shorten time. 
+     > Use `gentoo-kernel-bin` to install the latest stable pre-compiled kernel to save time. 
 
      > Be sure to install `intel-microcode` if you have an Intel CPU, while AMD's is included in `linux-firmware`.
 
@@ -568,7 +586,7 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
         >
         > `rw`
         >
-        > Seperate them with spaces, and replace `<your-root-uuid>` and `<your-subvolume>` with your actual root UUID and subvolume name.
+        > Separate them with spaces, and replace `<your-root-uuid>` and `<your-subvolume>` with your actual root UUID and subvolume name.
 
         **Be aware that DO NOT USE UUID to specify your root device if resides in a LVM logical volume**
 
@@ -613,7 +631,7 @@ Then back to the chroot environment to manipulate the `/etc/fstab` file as neede
   | UUID=<your-esp-UUID> | /efi | vfat | defaults | 0 | 2 |
   | UUID=<your-home-UUID> | /home | f2fs | defaults | 0 | 2 |
 
-  **Please note that DO NOT specify mounting points for LVM logical volumes with UUID**
+  **Please note: DO NOT specify mounting points for LVM logical volumes with UUID**
 
   **Instead, use `/dev/mapper/<your-vg-name>-<your-lv-name>`**
 
@@ -625,7 +643,8 @@ Then back to the chroot environment to manipulate the `/etc/fstab` file as neede
 passwd
 ```
 
-Execute the command to add a user and append the user to the `wheel` privileged group:
+
+Execute the command to add a user and add the user to the `wheel` privileged group:
 
 ```bash
 useradd -m -G wheel <username>
@@ -645,7 +664,8 @@ Execute the following command to install `sudo`:
 emerge -a sudo
 ```
 
-Edit the `/etc/sudoers` file and append user name.
+
+Edit the `/etc/sudoers` file and add the user name.
 
 #### Setup your init
 
@@ -715,7 +735,7 @@ Then enable its service to start at boot:
 
    Install what you need
 
-   > For instance, `btrfs-progs` for btrfs file system, `f2fs-tools` for f2fs file system, `dosfstools` for FAT32 file system, and `lvm2[lvm]` for LVM, etc.
+   > For example, `btrfs-progs` for btrfs file system, `f2fs-tools` for f2fs file system, `dosfstools` for FAT32 file system, and `lvm2[lvm]` for LVM, etc.
    
 5. WLAN utilities
 
@@ -776,7 +796,7 @@ Then reboot your system and choose Linux Boot Manager or UEFI OS from the boot m
   emerge -a xorg-server nvidia-drivers
   ```
 
-  > ATTENTION: If your NVIDIA GPU is the only GPU to output video, please add this configuration to `/etc/X11/xorg.conf.d/nvidia.conf`:
+  > ATTENTION: If your NVIDIA GPU is the only GPU to output video, please add the following configuration to `/etc/X11/xorg.conf.d/nvidia.conf`:
 
   >  ```
   >  Section "Device"
@@ -833,7 +853,7 @@ Then reboot your system and choose Linux Boot Manager or UEFI OS from the boot m
   
   - For `OpenRC` users, please double-check if there is a `/bin/gentoo-pipewire-launcher` exist.
 
-    For desktop environments that honour auto-start files, such as KDE Plasma, you don't need any extra steps.
+    For desktop environments that honor auto-start files, such as KDE Plasma, you don't need any extra steps.
 
     For others, please refer to https://wiki.gentoo.org/wiki/PipeWire#OpenRC
 
@@ -845,4 +865,5 @@ Then reboot your system and choose Linux Boot Manager or UEFI OS from the boot m
   ```
 
 
-**Now, you have accomplished the basic installation of Gentoo Linux**
+
+**Now, you have completed the basic installation of Gentoo Linux.**
