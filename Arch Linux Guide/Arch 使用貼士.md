@@ -3,28 +3,30 @@
 ## 設定與 Windows 相同的時間標準 (本地時間作爲硬體時間)
 
 ```sh
-sudo timedatectl set-local-rtc 1 --adjust-system-clock
+timedatectl set-local-rtc 1 --adjust-system-clock
 ```
 
 > 注意：您也可以變更 Windows 的時間標準設定，此處不贅述
 
 ## 啓用 `systemd` 的某些服務
 
-`fstrim.timer` 計時器會在每周激活服務，在所有已掛載的支持 discard 操作的檔案系統上執行 fstrim，此舉是通知磁碟主控使用演算法來將寫入作業平衡到整塊閃存上
+- `fstrim.timer` 計時器會在每周激活服務，在所有已掛載的支持 discard 操作的檔案系統上執行 fstrim，此舉是通知磁碟主控使用演算法來將寫入作業平衡到整塊閃存上
 
-執行
+  執行
 
-```sh
-sudo systemctl enable --now fstrim.timer
-```
+  ```sh
+  systemctl enable --now fstrim.timer
+  ```
 
-`nvidia-powerd.service` 是動態管理 NVIDIA GPU 電源狀態的服務，啓用以優化 NVIDIA GPU 電源使用狀況 (僅適用於筆記本電腦)
+- `nvidia-powerd.service` 是動態管理 NVIDIA GPU 電源狀態的服務，啓用以優化 NVIDIA GPU 電源使用狀況 (僅適用於筆記本電腦)
 
-執行
+  執行
 
-```sh
-sudo systemctl enable --now nvidia-powerd.service
-```
+  ```sh
+  systemctl enable nvidia-powerd.service
+  ```
+
+   > 此處切勿使用 `--now` 引數，因爲 NVIDIA Unix/Linux Driver 可能會導致 kernel panic！
 
 ## 加入 archlinuxcn 倉庫
 
@@ -33,10 +35,8 @@ sudo systemctl enable --now nvidia-powerd.service
 執行
 
 ```sh
-sudo nano /etc/pacman.conf
+nano /etc/pacman.conf
 ```
-
-以使用 `nano` 編輯 `pacman` 的配置檔案
 
 按下 `Control` 和 `End` 將光標移至檔案末尾，添加
 
@@ -56,7 +56,7 @@ Server = https://mirrors.cernet.edu.cn/archlinuxcn/$arch
 執行
 
 ```sh
-sudo pacman-key --lsign-key "farseerfc@archlinux.org"
+pacman-key --lsign-key "farseerfc@archlinux.org"
 ```
 
 以在本機添加對 farseerfc 的密鑰的信任
@@ -66,12 +66,12 @@ sudo pacman-key --lsign-key "farseerfc@archlinux.org"
 隨即執行
 
 ```sh
-sudo pacman -Sy archlinuxcn-keyring
+pacman -Sy archlinuxcn-keyring
 ```
 
 以加入 archlinuxcn 倉庫的 PGP 密鑰
 
-（可選）安裝 `archlinuxcn-mirrorlist-git` 以獲得一份 archlinuxcn 鏡像列表，以便于 `/etc/pacman.conf` 中直接引入
+(可選) 安裝 `archlinuxcn-mirrorlist-git` 以獲得一份 archlinuxcn 鏡像列表，以便于 `/etc/pacman.conf` 中直接引入
 
 ## 啓用 AUR 倉庫 (Arch Users' Repository)
 
@@ -82,7 +82,7 @@ sudo pacman -Sy archlinuxcn-keyring
 執行
 
 ```sh
-sudo pacman -S paru
+pacman -S paru
 ```
 
 - 同樣，您也可以自行安裝
@@ -90,7 +90,7 @@ sudo pacman -S paru
 執行
 
 ```sh
-sudo pacman -S --needed base-devel git
+pacman -S --needed base-devel git
 ```
 
 以安裝依賴項目
@@ -114,21 +114,21 @@ makepkg -si
 
 > `makepkg` 是 Arch Linux 所使用的建立包的軟體，類似於 Gentoo Linux 的 `portage` 和 FreeBSD 的 `ports`
 
-## 使用 Snapper 對作業系統進行快照備份
+## 使用 `snapper` 對作業系統進行快照備份
 
-**安裝 Snapper 及附加程式**
+**安裝 `snapper` 及附加程式**
 
 執行
 
 ```sh
-sudo pacman -S snapper snap-pac btrfs-assistant
+pacman -S snapper snap-pac btrfs-assistant
 ```
 
->`snapper` 是由 openSUSE 的 Arvin Schnell 開發的程式，用於管理 Btrfs 檔案系統子卷與 LVM Thin-provisioned 卷快照。通過建立和比較快照在快照間回滾，且支援自動按時間序列建立快照。
+> `snapper` 是由 openSUSE 的 Arvin Schnell 開發的程式，用於管理 Btrfs 檔案系統子卷與 LVM Thin-provisioned 卷快照。通過建立和比較快照在快照間回滾，且支援自動按時間序列建立快照。
 
->`snap-pac` 是一個 `pacman` 的腳本，用於在 `pacman` 執行前後觸發 `snapper` 建立快照
+> `snap-pac` 是一個 `pacman` 的腳本，用於在 `pacman` 執行前後觸發 `snapper` 建立快照
 
-**配置 Snapper 對 `/` 進行快照備份**
+**配置 `snapper` 對 `/` 進行快照備份**
 
 執行 `btrfs-assistant`
 
@@ -147,32 +147,32 @@ sudo pacman -S snapper snap-pac btrfs-assistant
 執行
 
 ```sh
-sudo nano /etc/snap-pac.ini
+nano /etc/snap-pac.ini
 ```
 
 請認真閱讀該檔案中的註釋並按需修改！
 
 ## 啓用防火牆
 
-`firewalld` 是一個動態管理的防火牆，支援使用“區域”來標識網路連綫與介面卡的可信等級。支援 IPv4、IPv6 防火牆設定、乙太網路橋接和 IP 組。可以使用分離的執行時配置和永久設定，也提供了一個接口用於直接為服務或程式加入防火牆規則。
+`firewalld` 是一個提供了功能強大的 GUI 的動態管理的防火牆，支援使用“區域”來為網路連綫與介面卡套用預設管理模板。使用分離的執行時配置和永久設定以增强安全性與靈活性。
 
 **安裝 `firewalld`**
 
 執行
 
 ```sh
-sudo pacman -S firewalld
+pacman -S firewalld
 ```
 
 **啓用服務**
 
 ```sh
-sudo systemctl enable --now firewalld
+systemctl enable --now firewalld
 ```
 
-此時，可於 *System Settings > Wi-Fi & Networking > Firewall* 中存取防火牆設定
+此時，可於 *System Settings -> Wi-Fi & Networking -> Firewall* 中存取防火牆設定
 
-## 啓用 `AppArmor`
+## 啓用 `apparmor`
 
 `apparmor` 是內核的一個安全模塊，實現的功能與 `SELinux` 類似，管理每個程式的存取行爲
 
@@ -181,7 +181,7 @@ sudo systemctl enable --now firewalld
 執行
 
 ```sh
-sudo pacman -S apparmor
+pacman -S apparmor
 ```
 
 **啓用服務**
@@ -189,7 +189,7 @@ sudo pacman -S apparmor
 執行
 
 ```sh
-sudo systemctl enable apparmor
+systemctl enable apparmor
 ```
 
 **要求內核啓動載入模塊**
@@ -212,17 +212,33 @@ sudo systemctl enable apparmor
     lsm=lockdown,landlock,yama,integrity,apparmor,bpf
     ```
 
+    (請勿改變順序！)
+
   - 使用 `systemd-boot` 啓動載入器
 
     編輯 `/<ESP>/loader/entries/<啓動項>`
 
-    於 `option` 後加入 `lsm=lockdown,landlock,yama,integrity,apparmor,bpf`
+    於 `option` 後加入 
+
+    ```
+    lsm=lockdown,landlock,yama,integrity,apparmor,bpf
+    ```
+
+    (請勿改變順序！)
 
 - 使用 UKI
 
-  若使用 `mkinitcpio` 建立 EFI 可執行的 UKI
+  對於使用 `mkinitcpio` 建立 EFI 可執行的 UKI
 
-  於 `/etc/cmdline.d` 中加入 `.conf` 純文字檔案並寫入 `lsm=lockdown,landlock,yama,integrity,apparmor,bpf` 即可
+  於 `/etc/cmdline.d` 中加入 `apparmor.conf` 純文字檔案並寫入
+  
+  ```
+  lsm=lockdown,landlock,yama,integrity,apparmor,bpf
+  ```
+
+  (請勿改變順序！)
+
+  即可
 
 ## 關於筆電的 NVIDIA GPU 上的 Xorg 進程
 
@@ -233,7 +249,7 @@ sudo systemctl enable apparmor
 執行
 
 ```sh
-sudo nano /etc/X11/xorg.conf.d/20-force-intel.conf
+nano /etc/X11/xorg.conf.d/20-force-intel.conf
 ```
 
 寫入
@@ -246,4 +262,4 @@ EndSection
 
 套用變更
 
-**本手冊僅供參考，欲進行更多自訂設定，請自行探索**
+**本手冊僅供參考**
