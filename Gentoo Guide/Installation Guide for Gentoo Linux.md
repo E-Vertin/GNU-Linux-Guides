@@ -590,7 +590,7 @@ ln -sf /usr/share/zoneinfo/<地區>/<城市> /etc/localtime
 
         **Be aware that DO NOT USE UUID to specify your root device if resides in a LVM logical volume**
 
-        **It's applicable to use `root=/dev/mapper/<your-vg-name>/<your-lv-name>`**
+        **It's applicable to use `root=/dev/mapper/<your-vg-name>-<your-lv-name>`**
 
 - For a system with `OpenRC` init that boots from a Unified Kernel Image (UKI) of `gentoo-kernel-bin` created by `dracut` with `systemd-boot` as the bootloader:
 
