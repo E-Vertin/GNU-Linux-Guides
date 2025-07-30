@@ -70,7 +70,7 @@ cfdisk /dev/<磁碟>
 
 - **建立 Header 備份**
 
-  > 請不要略過此步驟！密碼只用於解鎖 LUKS 容器，若 Header 損害，全部資料將丟失！
+  > 請不要略過此步驟！密碼只用於解鎖 LUKS 容器，若 Header 損毀，全部資料將丟失！
 
   執行
 
@@ -123,6 +123,7 @@ cryptsetup open /dev/<磁碟分割> <映射名稱>
   btrfs subvolume create @tmp
   btrfs subvolume create @cache
   btrfs subvolume create @home
+  cd && umount -Rl /mnt/gentoo
   ```
 
 - 為靈活使用磁碟空間，可以於 LUKS 中建立 LVM
@@ -156,7 +157,7 @@ cryptsetup open /dev/<磁碟分割> <映射名稱>
   或
 
   ```bash
-  lvcreate -l <百分比>%FREE <組名> -n <邏輯卷名稱>
+  lvcreate -l <百分比>FREE <組名> -n <邏輯卷名稱>
   ```
 
   > 例如：
