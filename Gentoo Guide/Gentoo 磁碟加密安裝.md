@@ -145,7 +145,7 @@ cryptsetup open /dev/<磁碟分割> <映射名稱>
   > 例如：
   > 
   > ```bash
-  > vgcreate sys /dev/mapper/nvme0n1
+  > vgcreate sys /dev/mapper/rootfs
   > ```
 
   建立 LVM 邏輯卷：
@@ -210,7 +210,7 @@ cryptsetup open /dev/<磁碟分割> <映射名稱>
   請至少指定：
 
   ```bash
-  kernel_cmdline+=" root=UUID=<磁碟分割 UUID> rd.luks.uuid=<LUKS 容器分割 UUID> rootflags=<根目錄挂載選項> rootfstype=<根目錄檔案系統類型> rw "
+  kernel_cmdline+=" root=UUID=<磁碟分割 UUID> rd.luks.uuid=<LUKS 容器分割 UUID> rd.luks.allow-discards rootflags=<根目錄挂載選項> rootfstype=<根目錄檔案系統類型> rw "
   ```
 
   > 若使用 LVM，則再加入 `rd.lvm.vg=<組名>`，且應避免使用 UUID 指派根目錄，而使用 `root=/dev/mapper/<組名>-<邏輯卷名稱>`
@@ -268,7 +268,7 @@ cryptsetup open /dev/<磁碟分割> <映射名稱>
    執行
 
    ```bash
-   clevis luks bind -d <LUKS 分割> tpm2 '{"pcr_bank":"sha256","pcr_ids":"0,2,3,5,6,7"}'
+   clevis luks bind -d /dev/<LUKS 分割> tpm2 '{"pcr_bank":"sha256","pcr_ids":"0,2,3,5,6,7"}'
    ```
 
    再次執行以檢查“鎖孔”

@@ -138,7 +138,7 @@ cryptsetup open /dev/<partition> <name to be mapped>
   > For example:
   >
   > ```bash
-  > vgcreate sys /dev/mapper/nvme0n1
+  > vgcreate sys /dev/mapper/rootfs
   > ```
 
   To create a LVM logical volume:
@@ -203,7 +203,7 @@ On the basis of installing all the file system libraries you need, you must inst
   Assign these at least:
 
   ```bash
-  kernel_cmdline+=" root=UUID=<partition UUID> rd.luks.uuid=<LUKS container UUID> rootflags=<options for mounting root> rootfstype=<root file system> rw "
+  kernel_cmdline+=" root=UUID=<partition UUID> rd.luks.uuid=<LUKS container UUID> rd.luks.allow-discards rootflags=<options for mounting root> rootfstype=<root file system> rw"
   ```
 
   > If using LVM, add `rd.lvm.vg=<group name>` as well, and avoid specifying root with UUID, use `root=/dev/mapper/<group name>-<logical volume name>` instead.
@@ -251,7 +251,7 @@ Now, your Gentoo Linux should boot successfully after your rebuilding your UKI.
    Run this command and check the `keyslots` section:
 
    ```bash
-   cryptsetup luksDump /dev/<partition>
+   cryptsetup luksDump /dev/<LUKS partition>
    ```
 
 2. Add a TPM key
@@ -259,13 +259,13 @@ Now, your Gentoo Linux should boot successfully after your rebuilding your UKI.
    Execute this to add a key:
 
    ```bash
-   clevis luks bind -d <LUKS 分割> tpm2 '{"pcr_bank":"sha256","pcr_ids":"0,2,3,5,6,7"}'
+   clevis luks bind -d /dev/<LUKS partition> tpm2 '{"pcr_bank":"sha256","pcr_ids":"0,2,3,5,6,7"}'
    ```
 
    Check the `keyslots` again:
 
    ```bash
-   cryptsetup luksDump /dev/<LUKS 分割>
+   cryptsetup luksDump /dev/<LUKS partition>
    ```
 
 3. Rebuild the UKI
