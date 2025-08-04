@@ -404,6 +404,8 @@ lvcreate -l 100%FREE Arch -n home
 
 > `lvcreate` 意為“建立 Logical Volume”，於某個 Volume Group 中分配具體的或按百分比計算的餘下的空間給某個 Logical Volume 並賦予其名稱
 
+> 慾於 LVM 中使用 `discard`，請於 `/etc/lvm/lvm.conf` 中尋找並改爲 `issue_discards = 1`
+
 #### 於 LVM 中建立檔案系統
 
 > LVM 中的 Logical Volume 是被映射至 Volume Group 裝置中的分割

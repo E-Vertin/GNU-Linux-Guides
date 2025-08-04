@@ -210,8 +210,12 @@ cryptsetup open /dev/<磁碟分割> <映射名稱>
   請至少指定：
 
   ```bash
-  kernel_cmdline+=" root=UUID=<磁碟分割 UUID> rd.luks.uuid=<LUKS 容器分割 UUID> rd.luks.allow-discards rootflags=<根目錄挂載選項> rootfstype=<根目錄檔案系統類型> rw "
+  kernel_cmdline+=" root=UUID=<磁碟分割 UUID> rd.luks.uuid=<LUKS 容器分割 UUID> rootflags=<根目錄挂載選項> rootfstype=<根目錄檔案系統類型> rw "
   ```
+
+  > 慾於 LUKS 中使用 `discard`，請加入 `rd.luks.allow-discards` 的內核引數
+
+  > 慾於 LVM 中使用 `discard`，請於 `/etc/lvm/lvm.conf` 中尋找並改爲 `issue_discards = 1`
 
   > 若使用 LVM，則再加入 `rd.lvm.vg=<組名>`，且應避免使用 UUID 指派根目錄，而使用 `root=/dev/mapper/<組名>-<邏輯卷名稱>`
 

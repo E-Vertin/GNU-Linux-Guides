@@ -203,8 +203,12 @@ On the basis of installing all the file system libraries you need, you must inst
   Assign these at least:
 
   ```bash
-  kernel_cmdline+=" root=UUID=<partition UUID> rd.luks.uuid=<LUKS container UUID> rd.luks.allow-discards rootflags=<options for mounting root> rootfstype=<root file system> rw"
+  kernel_cmdline+=" root=UUID=<partition UUID> rd.luks.uuid=<LUKS container UUID> rootflags=<options for mounting root> rootfstype=<root file system> rw"
   ```
+
+  > To use `discard` in LUKS, add `rd.luks.allow-discards` as kernel parameter.
+
+  > To use `discard` in LVM, search and change the option to `issue_discards = 1` in `/etc/lvm/lvm.conf`.
 
   > If using LVM, add `rd.lvm.vg=<group name>` as well, and avoid specifying root with UUID, use `root=/dev/mapper/<group name>-<logical volume name>` instead.
 
