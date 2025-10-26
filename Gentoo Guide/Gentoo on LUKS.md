@@ -214,6 +214,36 @@ On the basis of installing all the file system libraries you need, you must inst
 
 Now, your Gentoo Linux should boot successfully after your rebuilding your UKI.
 
+### Endable TRIM and optimisation for LUKS on SSD
+
+> Note: It's recommended for SSD users to perform this step.
+
+1. Check LUKS partition Flags
+
+   Execute this and check the `Flags` section:
+
+   ```bash
+   cryptsetup luksDump /dev/<LUKS partition>
+   ```
+   
+   > If the section is `none`, that means TRIM is not enabled.
+
+2. Alternate LUKS partition Flags
+
+   Execute this to change the Flags:
+
+   ```bash
+   cryptsetup --perf-no_read_workqueue --perf-no_write_workqueue --allow-discards --persistent refresh <device mapper name>
+   ```
+
+   > `<device mapper name>` can be found in `/dev/mapper` in the pattern of `luks-<UUID>`.
+
+   Check the `Flags` section again:
+
+   ```bash
+   cryptsetup luksDump /dev/<LUKS partition>
+   ```
+
 ## (Optional) Unlock LUKS automatically with TPM on startup
 
 > Alike to unlocking BitLocker volumes via TPM during system startup on Windows, the TPM will check UEFI settings and hardware for integrity. If modification detected, there will be a prompt for you to enter your passcode; otherwise, TPM will unlock LUKS automatically.

@@ -221,6 +221,35 @@ cryptsetup open /dev/<磁碟分割> <映射名稱>
 
 至此，重新建立 UKI 后 Gentoo Linux 應可正常啓動
 
+### 爲 SSD 上的 LUKS 分割啓用 TRIM 及效能優化
+
+> 注意：此步驟建議 SSD 使用者執行
+
+1. 檢查 LUKS 分割功能標籤
+
+   執行
+
+   ```bash
+   cryptsetup luksDump /dev/<LUKS 分割>
+   ```
+
+   並檢查 `Flags` 的内容
+
+   > 若爲 `none` 則表示未啓用
+
+2. 變更 LUKS 分割功能標籤
+
+   執行
+
+   ```bash
+   cryptsetup --perf-no_read_workqueue --perf-no_write_workqueue --allow-discards --persistent refresh <device mapper 名稱>
+   ```
+
+   > 其中，`<device mapper 名稱>` 可於 `/dev/mapper` 中查詢，一般爲 `luks-<UUID>`
+
+   再次執行 `cryptsetup luksDump /dev/<LUKS 分割>` 以檢查 `Flags` 的内容
+ 
+
 ## (可選) 使用 TPM 在開機時自動解鎖 LUKS
 
 > 類似 Windows 在啓動中使用 TPM 自動解鎖 BitLocker，TPM 將在啓動時檢查本機 UEFI 設定與硬體變動。若 TPM 偵測到變更，則需要人為輸入密碼；若否，則自動解鎖 LUKS 容器
