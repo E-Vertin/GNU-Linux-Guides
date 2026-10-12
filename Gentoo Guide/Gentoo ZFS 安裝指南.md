@@ -24,29 +24,29 @@
 
 1. 檢查磁碟
 
-  使用
+    使用
 
-  ```bash
-  lsblk
-  ```
+    ```bash
+    lsblk
+    ```
 
-  以列出本機磁碟
+    以列出本機磁碟
 
-  > 請記下磁碟檔案的位置，例如 `/dev/sda` 或 `/dev/nvme0n1`
+    > 請記下磁碟檔案的位置，例如 `/dev/sda` 或 `/dev/nvme0n1`
 
-  1. 使用 `cfdisk` 編輯分割表
+2. 使用 `cfdisk` 編輯分割表
 
-  執行 
+    執行 
 
-  ```bash
-  cfdisk /dev/<磁碟>
-  ```
+    ```bash
+    cfdisk /dev/<磁碟>
+    ```
 
-  以編輯分割表
+    以編輯分割表
 
-   - 為 ESP 建立一個 1 GB 的分割，並賦予 `EFI System Partition` 類型
+      - 為 ESP 建立一個 1 GB 的分割，並賦予 `EFI System Partition` 類型
 
-   - 為 ZFS 建立一個分割，並賦予 `Linux filesystem` 類型
+      - 為 ZFS 建立一個分割，並賦予 `Linux filesystem` 類型
 
 ### 建立 `zpool` 容器
 
@@ -62,7 +62,7 @@
     zpool create -o ashift=12 -o autotrim=on -O acltype=posix -O xattr=sa -O normalization=formD -m none <zpool 名稱> /dev/<磁碟分割>
     ```
 
-    以建立 `zpool` 儲存池
+    以建立 `zpool` 容器
 
     > 例如：
     >
@@ -80,7 +80,7 @@
 
 ### 建立檔案系統及 ZFS Dataset
 
-  1.  建立 ESP
+1.  建立 ESP
     
       執行
 
@@ -155,7 +155,7 @@
 
 ### `chroot` 進入新系統之前
 
-  為確保 DNS 解析正常，Gentoo Handbook 中要求將 `/etc/resolv.conf` 複製至新系統中
+  為確保 DNS 正常解析，Gentoo Handbook 中要求將 `/etc/resolv.conf` 複製至新系統中
 
   同樣，為確保 `zpool` 容器正常運作，請將 `/etc/hostid` 複製至新系統中
 
@@ -197,6 +197,10 @@
     systemctl enable zfs-import-cache
     systemctl enable zfs-mount
     ```
+
+  > 欲使用 NFS/SMB 共用 `Dataset`，請啟用 `zfs-share` 服務
+
+  > 貼士：`zfs-zed` 服務可用於監控 `zpool` 狀態並紀錄，可選啟用
 
 ## 完成安裝
 
