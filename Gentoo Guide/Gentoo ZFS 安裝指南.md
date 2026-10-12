@@ -22,31 +22,31 @@
 
 ### 編輯分割表
 
-  1. 檢查磁碟
+1. 檢查磁碟
 
-    使用
+  使用
 
-    ```bash
-    lsblk
-    ```
+  ```bash
+  lsblk
+  ```
 
-    以列出本機磁碟
+  以列出本機磁碟
 
-    > 請記下磁碟檔案的位置，例如 `/dev/sda` 或 `/dev/nvme0n1`
+  > 請記下磁碟檔案的位置，例如 `/dev/sda` 或 `/dev/nvme0n1`
 
-  2. 使用 `cfdisk` 編輯分割表
+  1. 使用 `cfdisk` 編輯分割表
 
-    執行 
+  執行 
 
-    ```bash
-    cfdisk /dev/<磁碟>
-    ```
+  ```bash
+  cfdisk /dev/<磁碟>
+  ```
 
-    以編輯分割表
+  以編輯分割表
 
-     - 為 ESP 建立一個 1 GiB 的分割，並賦予 EFI System Partition 類型
+   - 為 ESP 建立一個 1 GB 的分割，並賦予 `EFI System Partition` 類型
 
-     - 為 ZFS 建立一個分割，並賦予 Linux filesystem 類型
+   - 為 ZFS 建立一個分割，並賦予 `Linux filesystem` 類型
 
 ### 建立 `zpool` 容器
 
@@ -64,7 +64,9 @@
 
     以建立 `zpool` 儲存池
 
-    > 例如：`zpool create -o ashift=12 -o autotrim=on -O acltype=posix -O xattr=sa -O normalization=formD -m none root_zpool /dev/nvme1n1p2`
+    > 例如：
+    >
+    > `zpool create -o ashift=12 -o autotrim=on -O acltype=posix -O xattr=sa -O normalization=formD -m none root_zpool /dev/nvme1n1p2`
 
     > `zpool` 支援相當多引數，此處僅對以上命令中的作說明：
     >  - `ashift=12`，手動設定磁區大小為 4096 bytes（適用於絕多數磁碟）
@@ -133,21 +135,21 @@
 
 ## 執行安裝
 
-  - 掛載 `Dataset`
+  掛載 `Dataset`
 
-    執行以下命令以重新匯入 `zpool`，並設定臨時根目錄為 `/mnt/gentoo` 並暫時不掛載：
+  執行以下命令以重新匯入 `zpool`，並設定臨時根目錄為 `/mnt/gentoo` 並暫時不掛載：
 
-    ```bash
-    zpool export <zpool 名稱>
-    zpool import <zpool 名稱> -R /mnt/gentoo -N
-    ```
+  ```bash
+  zpool export <zpool 名稱>
+  zpool import <zpool 名稱> -R /mnt/gentoo -N
+  ```
 
-    由根目錄開始掛載檔案系統：
+  由根目錄開始掛載檔案系統：
 
-    ```bash
-    zfs mount <zpool 名稱>/<次頂層 dataset 名稱>/<dataset 名稱>
-    mount --mkdir /dev/<ESP 分割> /mnt/gentoo/efi
-    ```
+  ```bash
+  zfs mount <zpool 名稱>/<次頂層 dataset 名稱>/<dataset 名稱>
+  mount --mkdir /dev/<ESP 分割> /mnt/gentoo/efi
+  ```
 
 ## 有別於常規安裝的步驟
 
